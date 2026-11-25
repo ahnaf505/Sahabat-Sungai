@@ -26,7 +26,7 @@ export default function BottomNavigation({ activeTab, onNavigate }) {
             onPress={() => onNavigate({ key, path })}
             style={styles.tabButton}
           >
-            <Icon width={36} height={34} opacity={isActive ? 1 : 0.58} />
+            <Icon width={36} height={34} color={isActive ? '#005E36' : '#8C8C8C'} />
             <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{label}</Text>
             {isActive && <View style={styles.activeTabUnderline} />}
           </Pressable>
@@ -42,14 +42,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    minHeight: 82,
-    paddingTop: 12,
-    paddingBottom: 18,
+    minHeight: 98,
+    paddingTop: 18,
+    paddingBottom: 20,
     flexDirection: 'row',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     elevation: 12,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: -2 },
