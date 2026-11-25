@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
+import BugIcon from './assets/icons/bug.svg';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
 import ChevronDownIcon from './assets/icons/chevron-down.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
@@ -101,6 +102,24 @@ export default function InputObservationScreen({ onBack }) {
               <Text style={styles.dateInputText}>14 oktober 2026</Text>
               <ChevronDownIcon width={18} height={10} color="#000000" style={styles.dateInputChevron} />
             </View>
+            <View style={styles.bioindicatorHeader}>
+              <BugIcon width={28} height={28} accessibilityLabel="Bioindikator" />
+              <Text style={styles.bioindicatorHeaderTitle}>Makroinvertebrata</Text>
+            </View>
+            <View style={styles.sectionDivider} />
+            <View style={styles.bioindicatorList}>
+              <View style={styles.bioindicatorItem}>
+                <Image
+                  source={require('./assets/images/snail-bioindicator.png')}
+                  style={styles.bioindicatorImage}
+                  resizeMode="contain"
+                  accessibilityLabel="Contoh bioindikator siput"
+                />
+                <View style={styles.bioindicatorInfo}>
+                  <Text style={styles.bioindicatorName}>Gastropoda</Text>
+                </View>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -116,6 +135,16 @@ const poppinsSemiBold20 = {
   fontWeight: '600',
   fontSize: 20,
   lineHeight: 20,
+  letterSpacing: 0,
+  paddingVertical: 2,
+};
+
+const poppinsSemiBold16 = {
+  color: '#000000',
+  fontFamily: 'Poppins-SemiBold',
+  fontWeight: '600',
+  fontSize: 16,
+  lineHeight: 16,
   letterSpacing: 0,
   paddingVertical: 2,
 };
@@ -227,14 +256,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   dateHeaderTitle: {
+    ...poppinsSemiBold16,
     flexShrink: 1,
-    color: '#000000',
-    fontFamily: 'Poppins-SemiBold',
-    fontWeight: '600',
-    fontSize: 16,
-    lineHeight: 16,
-    letterSpacing: 0,
-    paddingVertical: 2,
   },
   dateInputBox: {
     width: '100%',
@@ -258,6 +281,53 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 16,
+    letterSpacing: 0,
+    paddingVertical: 2,
+  },
+  bioindicatorHeader: {
+    marginTop: 16,
+    marginLeft: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  bioindicatorHeaderTitle: {
+    ...poppinsSemiBold16,
+    flexShrink: 1,
+  },
+  sectionDivider: {
+    width: '94%',
+    alignSelf: 'center',
+    height: 1,
+    marginTop: 8,
+    backgroundColor: '#00000012',
+  },
+  bioindicatorList: {
+    width: '100%',
+    marginTop: 14,
+    paddingHorizontal: 10,
+    gap: 12,
+  },
+  bioindicatorItem: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  bioindicatorImage: {
+    width: 57,
+    height: 59,
+  },
+  bioindicatorInfo: {
+    flex: 1,
+    paddingBottom: 6,
+  },
+  bioindicatorName: {
+    color: '#000000',
+    fontFamily: 'Poppins-Medium',
+    fontWeight: '500',
+    fontSize: 14,
+    lineHeight: 14,
     letterSpacing: 0,
     paddingVertical: 2,
   },
