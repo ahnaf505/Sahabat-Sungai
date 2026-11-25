@@ -131,7 +131,7 @@ export default function InputObservationScreen({ onBack }) {
             </View>
             <View style={styles.sectionHeader}>
               <BugIcon width={28} height={28} accessibilityLabel="Bioindikator" />
-              <Text style={styles.bioindicatorHeaderTitle}>Makroinvertebrata</Text>
+              <Text style={styles.sectionHeaderTitle}>Makroinvertebrata</Text>
             </View>
             <View style={styles.sectionDivider} />
             <View style={styles.bioindicatorList}>
@@ -174,15 +174,16 @@ export default function InputObservationScreen({ onBack }) {
               <PlusIcon width={12} height={12} />
               <Text style={styles.listActionButtonLabel}>Tambah Organisme</Text>
             </Pressable>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, styles.chemicalSectionHeader]}>
               <View style={styles.sectionIconBox}>
                 <Image
                   source={require('./assets/icons/flask.png')}
                   style={styles.flaskIcon}
                   resizeMode="contain"
-                  accessibilityLabel="Parameter kimia"
+                  accessibilityLabel="Parameter fisik dan kimia"
                 />
               </View>
+              <Text style={styles.sectionHeaderTitle}>Parameter Fisik &amp; Kimia</Text>
             </View>
           </View>
         </View>
@@ -357,6 +358,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  chemicalSectionHeader: {
+    marginTop: 24,
+  },
   sectionIconBox: {
     width: 28,
     alignItems: 'center',
@@ -366,7 +370,7 @@ const styles = StyleSheet.create({
     width: 17,
     height: 24,
   },
-  bioindicatorHeaderTitle: {
+  sectionHeaderTitle: {
     ...poppinsSemiBold16,
     flexShrink: 1,
   },
