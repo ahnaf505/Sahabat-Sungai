@@ -3,6 +3,8 @@
     "name": "Sahabat-Sungai",
     "slug": "Sahabat-Sungai",
     "version": "1.0.0",
+    "scheme": "sahabat-sungai",
+    "plugins": ["expo-router"],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,6 +21,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
