@@ -11,6 +11,7 @@ import ChevronDownIcon from './assets/icons/chevron-down.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 import MinusIcon from './assets/icons/minus.svg';
 import PlusIcon from './assets/icons/plus.svg';
+import SaveIcon from './assets/icons/save.svg';
 import SproutIcon from './assets/icons/sprout.svg';
 
 const backgroundGradients = [
@@ -217,6 +218,10 @@ export default function InputObservationScreen({ onBack }) {
                 </View>
               ))}
             </View>
+            <Pressable style={styles.submitButton} accessibilityRole="button">
+              <SaveIcon width={18} height={18} />
+              <Text style={styles.submitButtonLabel}>Simpan Data</Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -540,6 +545,23 @@ const styles = StyleSheet.create({
     fontSize: 13.33,
     lineHeight: 13.33,
     letterSpacing: 0,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  submitButton: {
+    width: '100%',
+    height: 36,
+    marginTop: 16,
+    borderRadius: 15,
+    backgroundColor: '#1C5C3D',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  submitButtonLabel: {
+    ...poppinsSemiBold16,
+    color: '#FFFFFF',
     includeFontPadding: false,
     textAlignVertical: 'center',
   },
