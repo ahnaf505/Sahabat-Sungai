@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 import BugIcon from './assets/icons/bug.svg';
@@ -28,6 +28,17 @@ const backgroundGradients = [
   },
 ];
 
+const parameterRows = [
+  [
+    { key: 'suhu', label: 'Suhu (°C)' },
+    { key: 'kedalaman', label: 'Kedalaman (cm)' },
+  ],
+  [
+    { key: 'kecerahan', label: 'Kecerahan (cm)' },
+    { key: 'ph', label: 'pH' },
+  ],
+];
+
 const bioindicators = [
   {
     key: 'gastropoda',
@@ -48,6 +59,7 @@ const bioindicators = [
 export default function InputObservationScreen({ onBack }) {
   const [selectedPoint, setSelectedPoint] = useState(1);
   const [counts, setCounts] = useState({ gastropoda: 0, odonata: 0 });
+  const [parameters, setParameters] = useState({ suhu: '', kedalaman: '', kecerahan: '', ph: '' });
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -184,6 +196,26 @@ export default function InputObservationScreen({ onBack }) {
                 />
               </View>
               <Text style={styles.sectionHeaderTitle}>Parameter Fisik &amp; Kimia</Text>
+            </View>
+            <View style={styles.parameterGrid}>
+              {parameterRows.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.parameterRow}>
+                  {row.map(({ key, label }) => (
+                    <View key={key} style={styles.parameterBox}>
+                      <View style={styles.parameterTopBox}>
+                        {label ? <Text style={styles.parameterLabel}>{label}</Text> : null}
+                      </View>
+                      <TextInput
+                        style={styles.parameterInput}
+                        value={parameters[key]}
+                        onChangeText={(value) => setParameters((prev) => ({ ...prev, [key]: value }))}
+                        keyboardType="decimal-pad"
+                        accessibilityLabel={label}
+                      />
+                    </View>
+                  ))}
+                </View>
+              ))}
             </View>
           </View>
         </View>
@@ -369,6 +401,59 @@ const styles = StyleSheet.create({
   flaskIcon: {
     width: 17,
     height: 24,
+  },
+  parameterGrid: {
+    width: '100%',
+    marginTop: 12,
+    gap: 12,
+  },
+  parameterRow: {
+    width: '100%',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  parameterBox: {
+    flex: 1,
+    height: 57,
+    overflow: 'hidden',
+    borderRadius: 16,
+    borderWidth: 1.1,
+    borderColor: '#C4C3C3',
+    backgroundColor: '#FFFFFF',
+  },
+  parameterTopBox: {
+    height: 26.31,
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+  },
+  parameterLabel: {
+    color: '#000000',
+    fontFamily: 'Poppins-Regular',
+    fontWeight: '400',
+    fontSize: 8.77,
+    lineHeight: 8.77,
+    letterSpacing: 0,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+    paddingVertical: 1,
+  },
+  parameterInput: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 30.69,
+    paddingHorizontal: 12,
+    paddingVertical: 0,
+    borderRadius: 16,
+    borderWidth: 1.1,
+    borderColor: '#C4C3C3',
+    backgroundColor: '#FFFFFF',
+    color: '#000000',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 12,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   sectionHeaderTitle: {
     ...poppinsSemiBold16,
