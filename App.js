@@ -2,8 +2,10 @@ import { useRef } from 'react';
 import { Animated, Dimensions, Easing, Image, Pressable, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import BarChartIcon from './assets/icons/bar-chart.svg';
 import ChevronRightIcon from './assets/icons/chevron-right.svg';
 import ClipboardListIcon from './assets/icons/clipboard-list.svg';
+import GraduationCapIcon from './assets/icons/graduation-cap.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 import NavBookIcon from './assets/icons/nav-book.svg';
 import NavHomeIcon from './assets/icons/nav-home.svg';
@@ -24,6 +26,39 @@ const tabs = [
 
 const styles = createStyles(screenWidth, tabs.length);
 
+const homeActions = [
+  {
+    key: 'input-pengamatan',
+    label: 'Input Pengamatan',
+    Icon: ClipboardListIcon,
+    iconWidth: 29,
+    iconHeight: 36,
+    iconColor: '#FFFFFF',
+    buttonStyle: [styles.primaryActionButton, styles.inputActionButton],
+    labelStyle: styles.primaryActionButtonLabel,
+  },
+  {
+    key: 'lihat-analisis',
+    label: 'Lihat Analisis',
+    Icon: BarChartIcon,
+    iconWidth: 31,
+    iconHeight: 31,
+    iconColor: '#000000',
+    buttonStyle: [styles.secondaryActionButton, styles.analysisActionButton],
+    labelStyle: styles.secondaryActionButtonLabel,
+  },
+  {
+    key: 'belajar-bioindikator',
+    label: 'Belajar Bioindikator',
+    Icon: GraduationCapIcon,
+    iconWidth: 35,
+    iconHeight: 35,
+    iconColor: '#000000',
+    buttonStyle: [styles.secondaryActionButton, styles.educationActionButton],
+    labelStyle: styles.secondaryActionButtonLabel,
+  },
+];
+
 function HomeScreen() {
   return (
     <View style={styles.homeScreen}>
@@ -36,11 +71,13 @@ function HomeScreen() {
       <Text style={styles.greeting}>Halo, Penjelajah Sungai!</Text>
       <Text style={styles.subtext}>Ayo kita jaga kualitas sungai-sungai di lingkungan kita!</Text>
       <RiverInfoCard style={styles.infoCard} />
-      <Pressable style={styles.actionButton} accessibilityRole="button">
-        <ClipboardListIcon width={29} height={36} />
-        <Text style={styles.actionButtonLabel}>Input Pengamatan</Text>
-        <ChevronRightIcon width={11} height={19} color="#FFFFFF" style={styles.actionButtonChevron} />
-      </Pressable>
+      {homeActions.map(({ key, label, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
+        <Pressable key={key} style={[styles.actionButton, buttonStyle]} accessibilityRole="button">
+          <Icon width={iconWidth} height={iconHeight} color={iconColor} />
+          <Text style={[styles.actionButtonLabel, labelStyle]}>{label}</Text>
+          <ChevronRightIcon width={11} height={19} color={iconColor} style={styles.actionButtonChevron} />
+        </Pressable>
+      ))}
     </View>
   );
 }
