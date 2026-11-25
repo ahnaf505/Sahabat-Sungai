@@ -2,8 +2,10 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensio
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
 import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
+import LeafIcon from '../assets/icons/leaf.svg';
+import ToleranceDropIcon from '../assets/icons/tolerance-drop.svg';
+import WarningTriangleIcon from '../assets/icons/warning-triangle.svg';
 
 const backgroundGradients = [
   {
@@ -20,75 +22,33 @@ const backgroundGradients = [
   },
 ];
 
-function LeafBadgeIcon() {
-  return (
-    <Svg width={26} height={26} viewBox="0 0 26 26" fill="none">
-      <Path
-        d="M21.5 4.5C14.5 4.5 7.5 8 5.5 14.5C4.7 17.1 5.6 19.6 7.4 20.6C9.5 21.7 12.6 21.1 15.6 18.6C19.5 15.3 21.5 10.2 21.5 4.5Z"
-        fill="#2E9B41"
-      />
-      <Path
-        d="M5.5 21.5C7.8 17.8 11.4 14.2 16.5 11.5"
-        stroke="#CEEBD0"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-      />
-    </Svg>
-  );
-}
-
-function DropBadgeIcon() {
-  return (
-    <Svg width={26} height={26} viewBox="0 0 26 26" fill="none">
-      <Path
-        d="M13 3C13 3 6.5 10.5 6.5 15.5C6.5 19.3 9.4 22.5 13 22.5C16.6 22.5 19.5 19.3 19.5 15.5C19.5 10.5 13 3 13 3Z"
-        stroke="#F5A623"
-        strokeWidth={2}
-        strokeLinejoin="round"
-        fill="#FFF3D6"
-      />
-      <Path
-        d="M8.7 15.8C8.7 18.3 10.6 20.3 13 20.3C15.4 20.3 17.3 18.3 17.3 15.8C17.3 14.8 16.9 13.7 16.4 12.8C14.3 13.8 11.5 13.8 9.4 13C8.9 13.9 8.7 14.9 8.7 15.8Z"
-        fill="#F5A623"
-      />
-    </Svg>
-  );
-}
-
-function AlertBadgeIcon() {
-  return (
-    <Svg width={26} height={26} viewBox="0 0 26 26" fill="none">
-      <Path
-        d="M11.4 4.8C12.1 3.5 13.9 3.5 14.6 4.8L22.2 18.7C22.9 20 22 21.5 20.5 21.5H5.5C4 21.5 3.1 20 3.8 18.7L11.4 4.8Z"
-        fill="#D95B43"
-      />
-      <Path d="M13 9.8V14.5" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" />
-      <Circle cx={13} cy={17.8} r={1.2} fill="#FFFFFF" />
-    </Svg>
-  );
-}
-
 const toleranceLevels = [
   {
     key: 'peka',
     label: 'Peka',
     detail: '(air bersih)',
-    backgroundColor: '#CEEBD0',
-    Icon: LeafBadgeIcon,
+    backgroundColor: '#D5EED4',
+    Icon: LeafIcon,
+    iconWidth: 28,
+    iconHeight: 28,
   },
   {
     key: 'sedang',
     label: 'Sedang',
     detail: '(cukup baik)',
-    backgroundColor: '#FCE6BC',
-    Icon: DropBadgeIcon,
+    backgroundColor: '#FDE8BD',
+    Icon: ToleranceDropIcon,
+    iconWidth: 22,
+    iconHeight: 29,
   },
   {
     key: 'toleran',
     label: 'Toleran',
     detail: '(air tercemar)',
-    backgroundColor: '#FAD2C8',
-    Icon: AlertBadgeIcon,
+    backgroundColor: '#FBD8CA',
+    Icon: WarningTriangleIcon,
+    iconWidth: 28,
+    iconHeight: 28,
   },
 ];
 
@@ -161,9 +121,11 @@ export default function EdukasiScreen() {
           </Text>
 
           <View style={styles.toleranceRow}>
-            {toleranceLevels.map(({ key, label, detail, backgroundColor, Icon }) => (
+            {toleranceLevels.map(({ key, label, detail, backgroundColor, Icon, iconWidth, iconHeight }) => (
               <View key={key} style={[styles.toleranceCard, { backgroundColor }]}>
-                <Icon />
+                <View style={styles.toleranceIconBox}>
+                  <Icon width={iconWidth} height={iconHeight} />
+                </View>
                 <Text style={styles.toleranceTitle} numberOfLines={1} adjustsFontSizeToFit>
                   {label}
                 </Text>
@@ -316,6 +278,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     borderRadius: 14,
     alignItems: 'center',
+  },
+  toleranceIconBox: {
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   toleranceTitle: {
     marginTop: 6,
