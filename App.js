@@ -229,6 +229,7 @@ const screens = [
 ];
 
 export default function App() {
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
   return (
@@ -238,6 +239,16 @@ export default function App() {
         colors={['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA']}
         locations={[0, 0.24, 0.48, 0.7]}
         style={styles.lowerBackgroundGradient}
+      />
+      <Image
+        pointerEvents="none"
+        source={require('./assets/images/bush-illustration.png')}
+        style={[
+          styles.bottomLeftBush,
+          { bottom: Math.max(insets.bottom, 16) + 4 },
+        ]}
+        resizeMode="contain"
+        accessibilityLabel="Bush illustration"
       />
 
       <View style={styles.pageViewport}>

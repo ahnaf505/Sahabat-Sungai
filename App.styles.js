@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#cce7f0', overflow: 'hidden' },
   lowerBackgroundGradient: { position: 'absolute', top: '42%', left: 0, right: 0, bottom: 0 },
+  bottomLeftBush: { position: 'absolute', left: -20, width: 144, aspectRatio: 142 / 159 },
   pageViewport: { flex: 1, overflow: 'hidden' },
   pageTrack: { flex: 1, flexDirection: 'row' },
   page: { flex: 1 },
