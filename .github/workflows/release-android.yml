@@ -80,9 +80,11 @@ jobs:
           apk_name="Sahabat-Sungai-${TAG}.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$apk_name" --clobber
+            gh release edit "$TAG" --draft=false --latest
           else
             gh release create "$TAG" "$apk_name" \
               --title "Sahabat Sungai ${TAG}" \
               --generate-notes \
+              --latest \
               --verify-tag
           fi
