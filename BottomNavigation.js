@@ -42,8 +42,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    minHeight: 98,
-    paddingTop: 18,
+    minHeight: 110,
+    paddingTop: 28,
     paddingBottom: 20,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   tabButton: {
-    width: 76,
+    width: 88,
     alignItems: 'center',
     gap: 4,
     paddingTop: 0,
     paddingBottom: 8,
-    transform: [{ translateY: -9 }],
+    transform: [{ translateY: -4 }],
   },
   tabLabel: {
     color: '#8C8C8C',
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   activeTabLabel: {
     color: '#005E36',
-    fontFamily: 'AvantGarde-Demi',
+    fontFamily: 'Poppins-Bold',
     fontWeight: '700',
   },
   activeTabUnderline: {

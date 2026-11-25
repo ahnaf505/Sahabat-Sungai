@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Animated, Dimensions, Easing, Image, Pressable, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
@@ -13,10 +13,10 @@ import { createStyles } from './App.styles';
 const { width: screenWidth } = Dimensions.get('window');
 
 const tabs = [
-  { key: 'beranda', label: 'Beranda', Icon: NavHomeIcon },
-  { key: 'pantau', label: 'Pantau', Icon: NavPantauIcon },
-  { key: 'edukasi', label: 'Edukasi', Icon: NavBookIcon },
-  { key: 'profil', label: 'Profil', Icon: NavProfileIcon },
+  { key: 'beranda' },
+  { key: 'pantau' },
+  { key: 'edukasi' },
+  { key: 'profil' },
 ];
 
 const styles = createStyles(screenWidth, tabs.length);
@@ -109,20 +109,7 @@ const screens = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(0);
   const pageOffset = useRef(new Animated.Value(0)).current;
-
-  const selectTab = (index) => {
-    if (index === activeTab) return;
-
-    setActiveTab(index);
-    Animated.timing(pageOffset, {
-      toValue: -index * screenWidth,
-      duration: 280,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  };
 
   return (
     <View style={styles.container}>
@@ -143,25 +130,6 @@ export default function App() {
         </Animated.View>
       </View>
 
-      <View style={styles.bottomNavigation} accessibilityRole="tablist">
-        {tabs.map(({ key, label, Icon }, index) => {
-          const isActive = index === activeTab;
-          return (
-            <Pressable
-              key={key}
-              style={styles.tabButton}
-              onPress={() => selectTab(index)}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: isActive }}
-              accessibilityLabel={label}
-            >
-              <Icon width={36} height={34} color={isActive ? '#005E36' : '#8C8C8C'} />
-              <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{label}</Text>
-              {isActive && <View style={styles.activeTabUnderline} />}
-            </Pressable>
-          );
-        })}
-      </View>
       <StatusBar style="auto" />
     </View>
   );
