@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
+import ChevronRightIcon from './assets/icons/chevron-right.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 
 /** Displays the river location and last monitoring date card. */
@@ -9,6 +10,7 @@ export default function RiverInfoCard({ style }) {
       <MapPointIcon width={38} height={38} style={styles.mapPointIcon} accessibilityLabel="Lokasi sungai" />
       <Text style={styles.locationName}>Sungai Temboro Cemorokandang</Text>
       <Text style={styles.locationRegion}>Malang, Jawa Timur</Text>
+      <ChevronRightIcon width={11} height={19} color="#000000" style={styles.locationChevron} />
       <View style={styles.cardDivider} />
       <CalendarWeekIcon width={28} height={28} style={styles.monitoringIcon} accessibilityLabel="Monitoring terakhir" />
       <Text style={styles.monitoringLabel}>Monitoring Terakhir</Text>
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 18,
     left: 70,
-    right: 16,
+    right: 38,
     color: '#000000',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 17,
@@ -61,13 +63,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     left: 70,
-    right: 16,
+    right: 38,
     color: '#000000',
     fontFamily: 'AvantGarde Tx',
     fontSize: 17,
     lineHeight: 15,
     fontWeight: '400',
     paddingVertical: 4,
+  },
+  locationChevron: {
+    position: 'absolute',
+    top: 27.5,
+    right: 20,
   },
   monitoringIcon: {
     position: 'absolute',
