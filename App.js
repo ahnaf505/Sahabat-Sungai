@@ -61,6 +61,7 @@ const homeActions = [
   {
     key: 'belajar-bioindikator',
     label: 'Belajar Bioindikator',
+    path: '/edukasi',
     Icon: GraduationCapIcon,
     iconWidth: 35,
     iconHeight: 35,
