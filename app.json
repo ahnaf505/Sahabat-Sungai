@@ -5,7 +5,20 @@
     "version": "1.0.0",
     "scheme": "sahabat-sungai",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/AVGARDD2.otf",
+            "./assets/fonts/AVGARDR2.otf",
+            "./assets/fonts/Poppins-Regular.ttf",
+            "./assets/fonts/Poppins-Medium.ttf",
+            "./assets/fonts/Poppins-SemiBold.ttf",
+            "./assets/fonts/Poppins-Bold.ttf"
+          ]
+        }
+      ]
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
