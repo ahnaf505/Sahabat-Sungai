@@ -1,9 +1,17 @@
 import { StyleSheet } from 'react-native';
 
+const cardShadow = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 4,
+};
+
 export function createStyles(screenWidth, tabCount) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: '#cce7f0', overflow: 'hidden' },
-    lowerBackgroundGradient: { position: 'absolute', top: '65%', left: 0, right: 0, bottom: 82, backgroundColor: '#CDF1CA' },
+    lowerBackgroundGradient: { position: 'absolute', top: '65%', left: 0, right: 0, bottom: 0 },
     brand: { position: 'absolute', zIndex: 1, top: 80, left: 24, right: 24, flexDirection: 'row', alignItems: 'center' },
     waterDrop: { width: 60, height: 60 },
     brandName: { marginLeft: 12, color: '#005E36', fontFamily: 'AvantGarde-Demi', fontSize: 26, lineHeight: 25.42, fontWeight: '700', paddingVertical: 4 },
@@ -15,13 +23,10 @@ export function createStyles(screenWidth, tabCount) {
     riverIllustration: { position: 'absolute', top: 115, width: '100%', aspectRatio: 440 / 392 },
     greeting: { position: 'absolute', top: 167, left: 32, color: '#000000', fontFamily: 'AvantGarde-Demi', fontSize: 25, lineHeight: 30, fontWeight: '700' },
     subtext: { position: 'absolute', top: 200, left: 32, width: 300, color: '#000000', fontFamily: 'AvantGarde Tx', fontSize: 15, lineHeight: 19, fontWeight: '400' },
-    infoCard: { position: 'absolute', top: 345, left: 20, right: 20, height: 148, borderRadius: 24, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#0000000D', shadowColor: '#000000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 4 },
-    cardDivider: { position: 'absolute', top: 74, left: 20, right: 20, height: 1, backgroundColor: '#E0E0E0' },
-    mapPointIcon: { position: 'absolute', top: 18, left: 20, width: 38, height: 38 },
-    locationName: { position: 'absolute', top: 18, left: 70, right: 16, color: '#000000', fontFamily: 'AvantGarde-Demi', fontSize: 17, lineHeight: 15, fontWeight: '700', paddingVertical: 4 },
-    locationRegion: { position: 'absolute', top: 40, left: 70, right: 16, color: '#000000', fontFamily: 'AvantGarde Tx', fontSize: 17, lineHeight: 15, fontWeight: '400', paddingVertical: 4 },
-    monitoringIcon: { position: 'absolute', top: 96, left: 20, width: 28, height: 28 },
-    monitoringLabel: { position: 'absolute', top: 102, left: 70, color: '#000000', fontFamily: 'AvantGarde Tx', fontSize: 17, lineHeight: 15, fontWeight: '400' },
+    infoCard: { position: 'absolute', top: 345, left: 20, right: 20 },
+    actionButton: { position: 'absolute', top: 509, left: 20, right: 20, height: 62, paddingHorizontal: 20, borderRadius: 18, flexDirection: 'row', alignItems: 'center', gap: 21, backgroundColor: '#005E36', ...cardShadow },
+    actionButtonLabel: { color: '#FFFFFF', fontFamily: 'AvantGarde-Demi', fontSize: 20, lineHeight: 15, letterSpacing: 0, fontWeight: '700', paddingVertical: 5 },
+    actionButtonChevron: { marginLeft: 'auto' },
     contentScreen: { flex: 1, paddingTop: 180, paddingHorizontal: 24 },
     pageTitle: { color: '#005E36', fontFamily: 'AvantGarde-Demi', fontSize: 28, lineHeight: 34, fontWeight: '700' },
     pageIntro: { marginTop: 10, color: '#000000', fontFamily: 'AvantGarde Tx', fontSize: 16, lineHeight: 23, fontWeight: '400' },

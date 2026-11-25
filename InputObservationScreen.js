@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import RiverInfoCard from './RiverInfoCard';
 
 export default function InputObservationScreen({ onBack }) {
   return (
@@ -20,6 +21,7 @@ export default function InputObservationScreen({ onBack }) {
           <Text style={styles.backLabel}>‹</Text>
         </Pressable>
         <Text style={styles.title}>Input Observasi</Text>
+        <RiverInfoCard style={styles.infoCard} />
       </View>
 
       <StatusBar style="dark" />
@@ -59,5 +61,8 @@ const styles = StyleSheet.create({
     fontFamily: 'AvantGarde-Demi',
     fontSize: 28,
     lineHeight: 34,
+  },
+  infoCard: {
+    marginTop: 24,
   },
 });

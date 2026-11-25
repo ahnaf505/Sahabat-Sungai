@@ -1,7 +1,9 @@
 import { useRef } from 'react';
 import { Animated, Dimensions, Easing, Image, Pressable, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import CalendarWeekIcon from './assets/icons/calendar-week.svg';
+import { LinearGradient } from 'expo-linear-gradient';
+import ChevronRightIcon from './assets/icons/chevron-right.svg';
+import ClipboardListIcon from './assets/icons/clipboard-list.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 import NavBookIcon from './assets/icons/nav-book.svg';
 import NavHomeIcon from './assets/icons/nav-home.svg';
@@ -9,6 +11,7 @@ import NavPantauIcon from './assets/icons/nav-search.svg';
 import NavProfileIcon from './assets/icons/nav-profile.svg';
 import NotificationIcon from './assets/icons/notification.svg';
 import { createStyles } from './App.styles';
+import RiverInfoCard from './RiverInfoCard';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -32,14 +35,12 @@ function HomeScreen() {
       />
       <Text style={styles.greeting}>Halo, Penjelajah Sungai!</Text>
       <Text style={styles.subtext}>Ayo kita jaga kualitas sungai-sungai di lingkungan kita!</Text>
-      <View style={styles.infoCard}>
-        <MapPointIcon width={38} height={38} style={styles.mapPointIcon} accessibilityLabel="Lokasi sungai" />
-        <Text style={styles.locationName}>Sungai Temboro Cemorokandang</Text>
-        <Text style={styles.locationRegion}>Malang, Jawa Timur</Text>
-        <View style={styles.cardDivider} />
-        <CalendarWeekIcon width={28} height={28} style={styles.monitoringIcon} accessibilityLabel="Monitoring terakhir" />
-        <Text style={styles.monitoringLabel}>Monitoring Terakhir</Text>
-      </View>
+      <RiverInfoCard style={styles.infoCard} />
+      <Pressable style={styles.actionButton} accessibilityRole="button">
+        <ClipboardListIcon width={29} height={36} />
+        <Text style={styles.actionButtonLabel}>Input Pengamatan</Text>
+        <ChevronRightIcon width={11} height={19} color="#FFFFFF" style={styles.actionButtonChevron} />
+      </Pressable>
     </View>
   );
 }
@@ -113,7 +114,12 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View pointerEvents="none" style={styles.lowerBackgroundGradient} />
+      <LinearGradient
+        pointerEvents="none"
+        colors={['rgba(255, 255, 255, 0)', '#CDF1CA']}
+        locations={[0.0341, 0.243]}
+        style={styles.lowerBackgroundGradient}
+      />
       <View style={styles.brand}>
         <Image source={require('./assets/water-drop.png')} style={styles.waterDrop} accessibilityLabel="Sahabat Sungai logo" />
         <Text style={styles.brandName}>Sahabat{'\n'}Sungai</Text>
