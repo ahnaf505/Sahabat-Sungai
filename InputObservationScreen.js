@@ -170,6 +170,10 @@ export default function InputObservationScreen({ onBack }) {
                 </View>
               ))}
             </View>
+            <Pressable style={styles.listActionButton} accessibilityRole="button">
+              <PlusIcon width={12} height={12} />
+              <Text style={styles.listActionButtonLabel}>Tambah Organisme</Text>
+            </Pressable>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionIconBox}>
                 <Image
@@ -378,6 +382,28 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingHorizontal: 10,
     gap: 12,
+  },
+  listActionButton: {
+    width: '100%',
+    height: 32,
+    marginTop: 12,
+    borderRadius: 15,
+    backgroundColor: '#EDF7F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  listActionButtonLabel: {
+    color: '#000000',
+    fontFamily: 'Poppins-SemiBold',
+    fontWeight: '600',
+    fontSize: 12,
+    lineHeight: 12,
+    letterSpacing: 0,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+    paddingVertical: 3,
   },
   bioindicatorItem: {
     width: '100%',
