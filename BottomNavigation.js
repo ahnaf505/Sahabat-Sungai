@@ -21,7 +21,7 @@ export default function BottomNavigation({ activeTab, onNavigate }) {
       style={[
         styles.navigation,
         {
-          paddingBottom: Math.max(insets.bottom, 16),
+          paddingBottom: Math.max(insets.bottom, 16) + 18,
           paddingHorizontal: width < 360 ? 8 : 16,
         },
       ]}

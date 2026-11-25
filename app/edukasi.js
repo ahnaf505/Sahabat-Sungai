@@ -13,7 +13,7 @@ export default function EdukasiScreen() {
         styles.content,
         {
           paddingTop: insets.top + 32,
-          paddingBottom: Math.max(insets.bottom, 16) + 112,
+          paddingBottom: Math.max(insets.bottom, 16) + 130,
           paddingHorizontal: width < 360 ? 16 : 24,
         },
       ]}

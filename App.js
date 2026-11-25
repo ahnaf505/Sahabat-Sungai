@@ -1,4 +1,5 @@
 import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,6 +40,7 @@ const homeActions = [
   {
     key: 'input-pengamatan',
     label: 'Input Pengamatan',
+    path: '/input-observation',
     Icon: ClipboardListIcon,
     iconWidth: 29,
     iconHeight: 36,
@@ -72,7 +74,7 @@ function useResponsiveMetrics() {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const horizontalPadding = width < 360 ? 16 : 20;
-  const bottomNavClearance = Math.max(insets.bottom, 16) + 96;
+  const bottomNavClearance = Math.max(insets.bottom, 16) + 114;
 
   return { insets, width, height, horizontalPadding, bottomNavClearance };
 }
@@ -123,8 +125,13 @@ function HomeScreen() {
       <View style={[styles.homeActionsStack, { marginTop: cardTopMargin, gap: stackGap }]}>
         <RiverInfoCard />
         <View style={styles.homeButtonsGroup}>
-          {homeActions.map(({ key, label, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
-            <Pressable key={key} style={[styles.actionButton, buttonStyle]} accessibilityRole="button">
+          {homeActions.map(({ key, label, path, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
+            <Pressable
+              key={key}
+              style={[styles.actionButton, buttonStyle]}
+              accessibilityRole="button"
+              onPress={path ? () => router.replace(path) : undefined}
+            >
               <Icon width={iconWidth} height={iconHeight} color={iconColor} />
               <Text style={[styles.actionButtonLabel, labelStyle]} numberOfLines={1} adjustsFontSizeToFit>
                 {label}
@@ -265,7 +272,7 @@ export default function App() {
           style={[
             styles.cornerBush,
             style,
-            { bottom: Math.max(insets.bottom, 16) + bottomOffset },
+            { bottom: Math.max(insets.bottom, 16) + bottomOffset + 18 },
           ]}
           resizeMode="contain"
           accessibilityLabel={label}
