@@ -1,7 +1,24 @@
-import { Image, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
+import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
+
+const backgroundGradients = [
+  {
+    key: 'top',
+    colors: ['#CDF1CA', '#FFFFFF', '#FFFFFF', 'rgba(255, 255, 255, 0)'],
+    locations: [0.3, 0.52, 0.76, 1],
+    styleKey: 'topGradient',
+  },
+  {
+    key: 'bottom',
+    colors: ['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA'],
+    locations: [0, 0.24, 0.48, 0.7],
+    styleKey: 'bottomGradient',
+  },
+];
 
 function LeafBadgeIcon() {
   return (
@@ -83,11 +100,15 @@ export default function EdukasiScreen() {
 
   return (
     <View style={styles.screen}>
-      <LinearGradient
-        pointerEvents="none"
-        colors={['#E4F6E2', '#DDF3DA', '#D4F1D0']}
-        style={StyleSheet.absoluteFillObject}
-      />
+      {backgroundGradients.map(({ key, colors, locations, styleKey }) => (
+        <LinearGradient
+          key={key}
+          pointerEvents="none"
+          colors={colors}
+          locations={locations}
+          style={styles[styleKey]}
+        />
+      ))}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -99,6 +120,16 @@ export default function EdukasiScreen() {
           },
         ]}
       >
+        <View style={styles.headerRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Kembali"
+            onPress={() => router.replace('/')}
+            style={styles.backButton}
+          >
+            <ArrowLeftIcon width={25} height={25} color="#000000" />
+          </Pressable>
+        </View>
         <View style={styles.card}>
           <View
             style={[
@@ -151,14 +182,41 @@ export default function EdukasiScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#E4F6E2',
+    backgroundColor: '#FFFFFF',
+  },
+  topGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: '42%',
+  },
+  bottomGradient: {
+    position: 'absolute',
+    top: '42%',
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   content: {
     flexGrow: 1,
     maxWidth: 460,
     width: '100%',
     alignSelf: 'center',
+  },
+  headerRow: {
+    minHeight: 55,
+    marginBottom: 16,
     justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  backButton: {
+    width: 55,
+    height: 55,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 27.5,
+    backgroundColor: '#FFFFFF',
   },
   card: {
     width: '100%',
