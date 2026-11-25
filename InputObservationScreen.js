@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
+import CalendarWeekIcon from './assets/icons/calendar-week.svg';
+import ChevronDownIcon from './assets/icons/chevron-down.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 import SproutIcon from './assets/icons/sprout.svg';
 
@@ -23,6 +26,7 @@ const backgroundGradients = [
 ];
 
 export default function InputObservationScreen({ onBack }) {
+  const [selectedPoint, setSelectedPoint] = useState(1);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -67,9 +71,35 @@ export default function InputObservationScreen({ onBack }) {
               <Text style={styles.cardHeaderTitle}>Titik Pengamatan</Text>
             </View>
             <View style={styles.stationRow}>
-              {[0, 1, 2].map((index) => (
-                <View key={index} style={styles.stationBox} />
-              ))}
+              {[1, 2, 3].map((point) => {
+                const isSelected = selectedPoint === point;
+
+                return (
+                  <Pressable
+                    key={point}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isSelected }}
+                    onPress={() => setSelectedPoint(point)}
+                    style={[styles.stationBox, isSelected && styles.stationBoxActive]}
+                  >
+                    <Text
+                      style={[styles.stationBoxLabel, isSelected && styles.stationBoxLabelActive]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {`Titik ${point}`}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <View style={styles.dateHeader}>
+              <CalendarWeekIcon width={28} height={28} accessibilityLabel="Tanggal pengamatan" />
+              <Text style={styles.dateHeaderTitle}>Tanggal Pengamatan</Text>
+            </View>
+            <View style={styles.dateInputBox}>
+              <Text style={styles.dateInputText}>14 oktober 2026</Text>
+              <ChevronDownIcon width={18} height={10} color="#000000" style={styles.dateInputChevron} />
             </View>
           </View>
         </View>
@@ -82,7 +112,7 @@ export default function InputObservationScreen({ onBack }) {
 
 const poppinsSemiBold20 = {
   color: '#000000',
-  fontFamily: 'Poppins-Bold',
+  fontFamily: 'Poppins-SemiBold',
   fontWeight: '600',
   fontSize: 20,
   lineHeight: 20,
@@ -175,7 +205,60 @@ const styles = StyleSheet.create({
     width: 100,
     flexShrink: 1,
     height: 53,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
     borderRadius: 20,
     backgroundColor: '#EDF7F0',
+  },
+  stationBoxActive: {
+    backgroundColor: '#005E36',
+  },
+  stationBoxLabel: {
+    ...poppinsSemiBold20,
+  },
+  stationBoxLabelActive: {
+    color: '#FFFFFF',
+  },
+  dateHeader: {
+    marginTop: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  dateHeaderTitle: {
+    flexShrink: 1,
+    color: '#000000',
+    fontFamily: 'Poppins-SemiBold',
+    fontWeight: '600',
+    fontSize: 16,
+    lineHeight: 16,
+    letterSpacing: 0,
+    paddingVertical: 2,
+  },
+  dateInputBox: {
+    width: '100%',
+    height: 42,
+    marginTop: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#BABABA',
+    backgroundColor: '#FFFFFF',
+  },
+  dateInputChevron: {
+    marginLeft: 'auto',
+  },
+  dateInputText: {
+    flexShrink: 1,
+    color: '#000000',
+    fontFamily: 'Poppins-Medium',
+    fontWeight: '500',
+    fontSize: 16,
+    lineHeight: 16,
+    letterSpacing: 0,
+    paddingVertical: 2,
   },
 });
