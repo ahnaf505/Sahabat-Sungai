@@ -8,13 +8,13 @@ import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
 const backgroundGradients = [
   {
     key: 'top',
-    colors: ['#CDF1CA', '#FFFFFF', '#FFFFFF', 'rgba(255, 255, 255, 0)'],
+    colors: ['#CDF1CA', '#F2FBF1', '#F2FBF1', 'rgba(242, 251, 241, 0)'],
     locations: [0.3, 0.52, 0.76, 1],
     styleKey: 'topGradient',
   },
   {
     key: 'bottom',
-    colors: ['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA'],
+    colors: ['rgba(242, 251, 241, 0)', '#F2FBF1', '#F2FBF1', '#CDF1CA'],
     locations: [0, 0.24, 0.48, 0.7],
     styleKey: 'bottomGradient',
   },
@@ -95,8 +95,7 @@ const toleranceLevels = [
 export default function EdukasiScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const circleSize = width < 360 ? 148 : 172;
-  const imageSize = Math.round(circleSize * 0.74);
+  const circleSize = Math.min(250, width - 80);
 
   return (
     <View style={styles.screen}>
@@ -115,7 +114,7 @@ export default function EdukasiScreen() {
           styles.content,
           {
             paddingTop: insets.top + 16,
-            paddingBottom: Math.max(insets.bottom, 16) + 130,
+            paddingBottom: Math.max(insets.bottom, 16) + 124,
             paddingHorizontal: width < 360 ? 14 : 20,
           },
         ]}
@@ -129,6 +128,7 @@ export default function EdukasiScreen() {
           >
             <ArrowLeftIcon width={25} height={25} color="#000000" />
           </Pressable>
+          <Text style={styles.headerTitle}>Kenali Bioindikator</Text>
         </View>
         <View style={styles.card}>
           <View
@@ -143,7 +143,7 @@ export default function EdukasiScreen() {
           >
             <Image
               source={require('../assets/images/odonata-bioindicator.png')}
-              style={{ width: imageSize, height: imageSize }}
+              style={styles.odonataImage}
               resizeMode="contain"
               accessibilityLabel="Odonata"
             />
@@ -182,7 +182,7 @@ export default function EdukasiScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F2FBF1',
   },
   topGradient: {
     position: 'absolute',
@@ -208,9 +208,11 @@ const styles = StyleSheet.create({
     minHeight: 55,
     marginBottom: 16,
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   backButton: {
+    position: 'absolute',
+    left: 0,
     width: 55,
     height: 55,
     alignItems: 'center',
@@ -218,7 +220,19 @@ const styles = StyleSheet.create({
     borderRadius: 27.5,
     backgroundColor: '#FFFFFF',
   },
+  headerTitle: {
+    paddingHorizontal: 60,
+    textAlign: 'center',
+    color: '#000000',
+    fontFamily: 'Poppins-SemiBold',
+    fontWeight: '600',
+    fontSize: 20,
+    lineHeight: 22,
+    letterSpacing: 0,
+    paddingVertical: 2,
+  },
   card: {
+    flex: 1,
     width: '100%',
     paddingHorizontal: 20,
     paddingTop: 26,
@@ -226,12 +240,15 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    boxShadow: '0px 4px 4px 0px #00000040',
   },
   imageCircle: {
     backgroundColor: '#F3F7F6',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  odonataImage: {
+    width: 110,
+    height: 110,
   },
   title: {
     marginTop: 18,
@@ -262,14 +279,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: '#B5DDB4',
+    backgroundColor: '#BBE4BD',
   },
   groupBadgeText: {
     color: '#000000',
     fontFamily: 'Poppins-SemiBold',
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: 16,
     lineHeight: 16,
+    letterSpacing: 0,
+    includeFontPadding: false,
+    paddingVertical: 2,
   },
   description: {
     marginTop: 16,
@@ -277,8 +297,11 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontFamily: 'Poppins-Regular',
     fontWeight: '400',
-    fontSize: 13.5,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 16,
+    letterSpacing: 0,
+    includeFontPadding: false,
+    paddingVertical: 2,
     textAlign: 'center',
   },
   toleranceRow: {
