@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import DatePickerModal, { formatIndonesianDate } from './DatePickerModal';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 import BugIcon from './assets/icons/bug.svg';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
@@ -57,10 +58,16 @@ const bioindicators = [
   },
 ];
 
+const INITIAL_COUNTS = { gastropoda: 0, odonata: 0 };
+const INITIAL_PARAMETERS = { suhu: '', kedalaman: '', kecerahan: '', ph: '' };
+
 export default function InputObservationScreen({ onBack }) {
   const [selectedPoint, setSelectedPoint] = useState(1);
-  const [counts, setCounts] = useState({ gastropoda: 0, odonata: 0 });
-  const [parameters, setParameters] = useState({ suhu: '', kedalaman: '', kecerahan: '', ph: '' });
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [counts, setCounts] = useState(INITIAL_COUNTS);
+  const [parameters, setParameters] = useState(INITIAL_PARAMETERS);
+  const [feedbackModal, setFeedbackModal] = useState(null);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -69,6 +76,44 @@ export default function InputObservationScreen({ onBack }) {
       ...prev,
       [key]: Math.max(0, (prev[key] ?? 0) + delta),
     }));
+  };
+
+  const handleSave = () => {
+    const missingFields = [];
+
+    if (!selectedPoint) {
+      missingFields.push('Titik Pengamatan');
+    }
+    if (!selectedDate) {
+      missingFields.push('Tanggal Pengamatan');
+    }
+
+    for (const { key, label } of parameterRows.flat()) {
+      const raw = (parameters[key] ?? '').trim();
+      const numeric = Number(raw.replace(',', '.'));
+      if (!raw || Number.isNaN(numeric)) {
+        missingFields.push(label);
+      }
+    }
+
+    if (missingFields.length > 0) {
+      setFeedbackModal({
+        type: 'error',
+        title: 'Data Belum Lengkap',
+        message: `Harap lengkapi semua kolom dengan benar:\n• ${missingFields.join('\n• ')}`,
+      });
+      return;
+    }
+
+    setSelectedPoint(null);
+    setSelectedDate(null);
+    setCounts(INITIAL_COUNTS);
+    setParameters(INITIAL_PARAMETERS);
+    setFeedbackModal({
+      type: 'success',
+      title: 'Data Tersimpan',
+      message: 'Data pengamatan berhasil disimpan.',
+    });
   };
 
   return (
@@ -138,10 +183,17 @@ export default function InputObservationScreen({ onBack }) {
               <CalendarWeekIcon width={28} height={28} accessibilityLabel="Tanggal pengamatan" />
               <Text style={styles.dateHeaderTitle}>Tanggal Pengamatan</Text>
             </View>
-            <View style={styles.dateInputBox}>
-              <Text style={styles.dateInputText}>14 oktober 2026</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Pilih tanggal pengamatan"
+              onPress={() => setDatePickerVisible(true)}
+              style={styles.dateInputBox}
+            >
+              <Text style={[styles.dateInputText, !selectedDate && styles.dateInputPlaceholder]}>
+                {selectedDate ? formatIndonesianDate(selectedDate) : 'Pilih tanggal'}
+              </Text>
               <ChevronDownIcon width={18} height={10} color="#000000" style={styles.dateInputChevron} />
-            </View>
+            </Pressable>
             <View style={styles.sectionHeader}>
               <BugIcon width={28} height={28} accessibilityLabel="Bioindikator" />
               <Text style={styles.sectionHeaderTitle}>Makroinvertebrata</Text>
@@ -218,13 +270,56 @@ export default function InputObservationScreen({ onBack }) {
                 </View>
               ))}
             </View>
-            <Pressable style={styles.submitButton} accessibilityRole="button">
+            <Pressable style={styles.submitButton} accessibilityRole="button" onPress={handleSave}>
               <SaveIcon width={18} height={18} />
               <Text style={styles.submitButtonLabel}>Simpan Data</Text>
             </Pressable>
           </View>
         </View>
       </ScrollView>
+
+      <DatePickerModal
+        visible={datePickerVisible}
+        selectedDate={selectedDate}
+        onSelect={setSelectedDate}
+        onClose={() => setDatePickerVisible(false)}
+      />
+
+      <Modal
+        visible={Boolean(feedbackModal)}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setFeedbackModal(null)}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={() => setFeedbackModal(null)}>
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            <View
+              style={[
+                styles.modalBadge,
+                feedbackModal?.type === 'error' ? styles.modalBadgeError : styles.modalBadgeSuccess,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.modalBadgeText,
+                  feedbackModal?.type === 'error' ? styles.modalBadgeTextError : styles.modalBadgeTextSuccess,
+                ]}
+              >
+                {feedbackModal?.type === 'error' ? '!' : '✓'}
+              </Text>
+            </View>
+            <Text style={styles.modalTitle}>{feedbackModal?.title}</Text>
+            <Text style={styles.modalMessage}>{feedbackModal?.message}</Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setFeedbackModal(null)}
+              style={styles.modalOkButton}
+            >
+              <Text style={styles.modalOkLabel}>OK</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       <StatusBar style="dark" />
     </View>
@@ -387,6 +482,9 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlignVertical: 'center',
     paddingVertical: 2,
+  },
+  dateInputPlaceholder: {
+    color: '#8C8C8C',
   },
   sectionHeader: {
     marginTop: 16,
@@ -564,5 +662,70 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     includeFontPadding: false,
     textAlignVertical: 'center',
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 340,
+    padding: 24,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+  },
+  modalBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  modalBadgeSuccess: {
+    backgroundColor: '#EDF7F0',
+  },
+  modalBadgeError: {
+    backgroundColor: '#FAD2C8',
+  },
+  modalBadgeText: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  modalBadgeTextSuccess: {
+    color: '#1C5C3D',
+  },
+  modalBadgeTextError: {
+    color: '#B91C1C',
+  },
+  modalTitle: {
+    ...poppinsSemiBold20,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    marginTop: 8,
+    color: '#374151',
+    fontFamily: 'Poppins-Regular',
+    fontWeight: '400',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  modalOkButton: {
+    marginTop: 18,
+    width: '100%',
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: '#1C5C3D',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalOkLabel: {
+    ...poppinsSemiBold16,
+    color: '#FFFFFF',
   },
 });
