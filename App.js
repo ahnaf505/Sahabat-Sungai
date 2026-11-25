@@ -18,6 +18,23 @@ const tabs = [
   { key: 'profil' },
 ];
 
+const cornerBushes = [
+  {
+    key: 'bottom-left-bush',
+    source: require('./assets/images/bush-illustration.png'),
+    style: styles.bottomLeftBush,
+    bottomOffset: 4,
+    label: 'Left bush illustration',
+  },
+  {
+    key: 'bottom-right-bush',
+    source: require('./assets/images/bush-right-illustration.png'),
+    style: styles.bottomRightBush,
+    bottomOffset: 24,
+    label: 'Right bush illustration',
+  },
+];
+
 const homeActions = [
   {
     key: 'input-pengamatan',
@@ -240,16 +257,20 @@ export default function App() {
         locations={[0, 0.24, 0.48, 0.7]}
         style={styles.lowerBackgroundGradient}
       />
-      <Image
-        pointerEvents="none"
-        source={require('./assets/images/bush-illustration.png')}
-        style={[
-          styles.bottomLeftBush,
-          { bottom: Math.max(insets.bottom, 16) + 4 },
-        ]}
-        resizeMode="contain"
-        accessibilityLabel="Bush illustration"
-      />
+      {cornerBushes.map(({ key, source, style, bottomOffset, label }) => (
+        <Image
+          key={key}
+          pointerEvents="none"
+          source={source}
+          style={[
+            styles.cornerBush,
+            style,
+            { bottom: Math.max(insets.bottom, 16) + bottomOffset },
+          ]}
+          resizeMode="contain"
+          accessibilityLabel={label}
+        />
+      ))}
 
       <View style={styles.pageViewport}>
         <View style={[styles.pageTrack, { width: width * tabs.length }]}>
