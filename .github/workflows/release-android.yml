@@ -49,6 +49,9 @@ jobs:
       - name: Generate the Android project
         run: CI=1 npx expo prebuild --platform android --no-install
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build installable APK
         run: ./gradlew app:assembleDebug
         working-directory: android
