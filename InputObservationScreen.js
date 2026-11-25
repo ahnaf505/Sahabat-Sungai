@@ -9,6 +9,8 @@ import BugIcon from './assets/icons/bug.svg';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
 import ChevronDownIcon from './assets/icons/chevron-down.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
+import MinusIcon from './assets/icons/minus.svg';
+import PlusIcon from './assets/icons/plus.svg';
 import SproutIcon from './assets/icons/sprout.svg';
 
 const backgroundGradients = [
@@ -26,10 +28,35 @@ const backgroundGradients = [
   },
 ];
 
+const bioindicators = [
+  {
+    key: 'gastropoda',
+    name: 'Gastropoda',
+    source: require('./assets/images/snail-bioindicator.png'),
+    imageStyle: { width: 47, height: 49 },
+    accessibilityLabel: 'Bioindikator Gastropoda',
+  },
+  {
+    key: 'odonata',
+    name: 'Odonata',
+    source: require('./assets/images/odonata-bioindicator.png'),
+    imageStyle: { width: 44, height: 44 },
+    accessibilityLabel: 'Bioindikator Odonata',
+  },
+];
+
 export default function InputObservationScreen({ onBack }) {
   const [selectedPoint, setSelectedPoint] = useState(1);
+  const [counts, setCounts] = useState({ gastropoda: 0, odonata: 0 });
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+
+  const updateCount = (key, delta) => {
+    setCounts((prev) => ({
+      ...prev,
+      [key]: Math.max(0, (prev[key] ?? 0) + delta),
+    }));
+  };
 
   return (
     <View style={styles.screen}>
@@ -102,22 +129,55 @@ export default function InputObservationScreen({ onBack }) {
               <Text style={styles.dateInputText}>14 oktober 2026</Text>
               <ChevronDownIcon width={18} height={10} color="#000000" style={styles.dateInputChevron} />
             </View>
-            <View style={styles.bioindicatorHeader}>
+            <View style={styles.sectionHeader}>
               <BugIcon width={28} height={28} accessibilityLabel="Bioindikator" />
               <Text style={styles.bioindicatorHeaderTitle}>Makroinvertebrata</Text>
             </View>
             <View style={styles.sectionDivider} />
             <View style={styles.bioindicatorList}>
-              <View style={styles.bioindicatorItem}>
-                <Image
-                  source={require('./assets/images/snail-bioindicator.png')}
-                  style={styles.bioindicatorImage}
-                  resizeMode="contain"
-                  accessibilityLabel="Contoh bioindikator siput"
-                />
-                <View style={styles.bioindicatorInfo}>
-                  <Text style={styles.bioindicatorName}>Gastropoda</Text>
+              {bioindicators.map(({ key, name, source, imageStyle, accessibilityLabel }) => (
+                <View key={key} style={styles.bioindicatorItem}>
+                  <View style={styles.bioindicatorImageBox}>
+                    <Image
+                      source={source}
+                      style={imageStyle}
+                      resizeMode="contain"
+                      accessibilityLabel={accessibilityLabel}
+                    />
+                  </View>
+                  <View style={styles.bioindicatorInfo}>
+                    <Text style={styles.bioindicatorName}>{name}</Text>
+                  </View>
+                  <View style={styles.counterGroup}>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Kurangi jumlah ${name}`}
+                      onPress={() => updateCount(key, -1)}
+                      style={styles.counterButton}
+                    >
+                      <MinusIcon width={14} height={2} />
+                    </Pressable>
+                    <Text style={styles.counterValue}>{counts[key] ?? 0}</Text>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Tambah jumlah ${name}`}
+                      onPress={() => updateCount(key, 1)}
+                      style={styles.counterButton}
+                    >
+                      <PlusIcon width={12} height={12} />
+                    </Pressable>
+                  </View>
                 </View>
+              ))}
+            </View>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIconBox}>
+                <Image
+                  source={require('./assets/icons/flask.png')}
+                  style={styles.flaskIcon}
+                  resizeMode="contain"
+                  accessibilityLabel="Parameter kimia"
+                />
               </View>
             </View>
           </View>
@@ -282,14 +342,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 16,
     letterSpacing: 0,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
     paddingVertical: 2,
   },
-  bioindicatorHeader: {
+  sectionHeader: {
     marginTop: 16,
     marginLeft: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  sectionIconBox: {
+    width: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flaskIcon: {
+    width: 17,
+    height: 24,
   },
   bioindicatorHeaderTitle: {
     ...poppinsSemiBold16,
@@ -304,7 +375,7 @@ const styles = StyleSheet.create({
   },
   bioindicatorList: {
     width: '100%',
-    marginTop: 14,
+    marginTop: 6,
     paddingHorizontal: 10,
     gap: 12,
   },
@@ -314,21 +385,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  bioindicatorImage: {
-    width: 57,
-    height: 59,
+  bioindicatorImageBox: {
+    width: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bioindicatorInfo: {
     flex: 1,
-    paddingBottom: 6,
   },
   bioindicatorName: {
     color: '#000000',
     fontFamily: 'Poppins-Medium',
     fontWeight: '500',
     fontSize: 14,
-    lineHeight: 14,
+    lineHeight: 18,
     letterSpacing: 0,
-    paddingVertical: 2,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  counterGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  counterButton: {
+    width: 29.16,
+    height: 29.16,
+    borderRadius: 14.58,
+    backgroundColor: '#EDF7F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterValue: {
+    minWidth: 16,
+    textAlign: 'center',
+    color: '#000000',
+    fontFamily: 'Poppins-Medium',
+    fontWeight: '500',
+    fontSize: 13.33,
+    lineHeight: 13.33,
+    letterSpacing: 0,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
 });
