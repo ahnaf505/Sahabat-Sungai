@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -46,26 +50,39 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Run lint
+        run: npx expo lint
+
       - name: Generate the Android project
         run: CI=1 npx expo prebuild --platform android --no-install
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build installable APK
-        run: ./gradlew app:assembleDebug
+      - name: Build release APK
+        run: ./gradlew app:assembleRelease --stacktrace
         working-directory: android
 
-      - name: Package APK for the release
+      - name: Package and verify release APK
         env:
           TAG: ${{ github.ref_name }}
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk "Sahabat-Sungai-${TAG}.apk"
+        run: |
+          apk_name="Sahabat-Sungai-${TAG}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$apk_name"
+          test -s "$apk_name"
+          unzip -l "$apk_name" | grep -q "assets/index.android.bundle"
 
-      - name: Create GitHub release
+      - name: Create or update GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
-          gh release create "$TAG" "Sahabat-Sungai-${TAG}.apk" \
-            --title "Sahabat Sungai ${TAG}" \
-            --generate-notes
+          apk_name="Sahabat-Sungai-${TAG}.apk"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$apk_name" --clobber
+          else
+            gh release create "$TAG" "$apk_name" \
+              --title "Sahabat Sungai ${TAG}" \
+              --generate-notes \
+              --verify-tag
+          fi
