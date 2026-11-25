@@ -1,9 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import RiverInfoCard from './RiverInfoCard';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function InputObservationScreen({ onBack }) {
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+
   return (
     <View style={styles.screen}>
       <LinearGradient
@@ -11,7 +14,17 @@ export default function InputObservationScreen({ onBack }) {
         locations={[0, 0.4423]}
         style={styles.gradient}
       />
-      <View style={styles.content}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: insets.top + 16,
+            paddingBottom: Math.max(insets.bottom, 16) + 112,
+            paddingHorizontal: width < 360 ? 16 : 24,
+          },
+        ]}
+      >
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Kembali"
@@ -21,8 +34,7 @@ export default function InputObservationScreen({ onBack }) {
           <Text style={styles.backLabel}>‹</Text>
         </Pressable>
         <Text style={styles.title}>Input Observasi</Text>
-        <RiverInfoCard style={styles.infoCard} />
-      </View>
+      </ScrollView>
 
       <StatusBar style="dark" />
     </View>
@@ -38,10 +50,10 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   content: {
-    flex: 1,
-    paddingTop: 72,
-    paddingHorizontal: 24,
-    paddingBottom: 82,
+    flexGrow: 1,
+    maxWidth: 500,
+    width: '100%',
+    alignSelf: 'center',
   },
   backButton: {
     width: 44,
@@ -61,8 +73,5 @@ const styles = StyleSheet.create({
     fontFamily: 'AvantGarde-Demi',
     fontSize: 28,
     lineHeight: 34,
-  },
-  infoCard: {
-    marginTop: 24,
   },
 });

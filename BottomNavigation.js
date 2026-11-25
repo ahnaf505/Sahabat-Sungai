@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BookIcon from './assets/icons/nav-book.svg';
 import HomeIcon from './assets/icons/nav-home.svg';
 import ProfileIcon from './assets/icons/nav-profile.svg';
@@ -12,8 +13,20 @@ const tabs = [
 ];
 
 export default function BottomNavigation({ activeTab, onNavigate }) {
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+
   return (
-    <View style={styles.navigation} accessibilityRole="tablist">
+    <View
+      style={[
+        styles.navigation,
+        {
+          paddingBottom: Math.max(insets.bottom, 16),
+          paddingHorizontal: width < 360 ? 8 : 16,
+        },
+      ]}
+      accessibilityRole="tablist"
+    >
       {tabs.map(({ key, label, Icon, path }) => {
         const isActive = activeTab === key;
 
@@ -27,7 +40,9 @@ export default function BottomNavigation({ activeTab, onNavigate }) {
             style={styles.tabButton}
           >
             <Icon width={36} height={34} color={isActive ? '#005E36' : '#8C8C8C'} />
-            <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{label}</Text>
+            <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]} numberOfLines={1}>
+              {label}
+            </Text>
             {isActive && <View style={styles.activeTabUnderline} />}
           </Pressable>
         );
@@ -42,14 +57,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    minHeight: 110,
-    paddingTop: 28,
-    paddingBottom: 20,
+    paddingTop: 18,
     flexDirection: 'row',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 25,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
     borderWidth: 1,
+    borderBottomWidth: 0,
     borderColor: '#E5E7EB',
     elevation: 12,
     shadowColor: '#000000',
@@ -58,12 +73,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   tabButton: {
-    width: 88,
+    flex: 1,
+    maxWidth: 96,
     alignItems: 'center',
     gap: 4,
-    paddingTop: 0,
-    paddingBottom: 8,
-    transform: [{ translateY: -4 }],
+    paddingBottom: 6,
   },
   tabLabel: {
     color: '#8C8C8C',
@@ -71,7 +85,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '400',
     letterSpacing: 0,
-    lineHeight: 24.08,
+    lineHeight: 22,
     textAlign: 'center',
   },
   activeTabLabel: {
@@ -81,8 +95,9 @@ const styles = StyleSheet.create({
   },
   activeTabUnderline: {
     position: 'absolute',
-    bottom: -1,
-    width: 76,
+    bottom: -4,
+    width: '75%',
+    maxWidth: 76,
     height: 5,
     borderRadius: 3,
     backgroundColor: '#005E36',

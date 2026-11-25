@@ -7,21 +7,34 @@ import MapPointIcon from './assets/icons/map-point.svg';
 export default function RiverInfoCard({ style }) {
   return (
     <View style={[styles.card, style]}>
-      <MapPointIcon width={38} height={38} style={styles.mapPointIcon} accessibilityLabel="Lokasi sungai" />
-      <Text style={styles.locationName}>Sungai Temboro Cemorokandang</Text>
-      <Text style={styles.locationRegion}>Malang, Jawa Timur</Text>
-      <ChevronRightIcon width={11} height={19} color="#000000" style={styles.locationChevron} />
+      <View style={styles.row}>
+        <MapPointIcon width={38} height={38} accessibilityLabel="Lokasi sungai" />
+        <View style={styles.locationTextGroup}>
+          <Text style={styles.locationName}>Sungai Temboro Cemorokandang</Text>
+          <Text style={styles.locationRegion}>Malang, Jawa Timur</Text>
+        </View>
+        <ChevronRightIcon width={11} height={19} color="#000000" />
+      </View>
+
       <View style={styles.cardDivider} />
-      <CalendarWeekIcon width={28} height={28} style={styles.monitoringIcon} accessibilityLabel="Monitoring terakhir" />
-      <Text style={styles.monitoringLabel}>Monitoring Terakhir</Text>
-      <Text style={styles.monitoringDate}>14 Oktober 2026</Text>
+
+      <View style={styles.row}>
+        <CalendarWeekIcon width={28} height={28} accessibilityLabel="Monitoring terakhir" />
+        <View style={styles.monitoringTextGroup}>
+          <Text style={styles.monitoringLabel}>Monitoring Terakhir</Text>
+          <Text style={styles.monitoringDate}>14 Oktober 2026</Text>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    height: 148,
+    minHeight: 148,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    justifyContent: 'center',
     borderRadius: 24,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -32,61 +45,41 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  cardDivider: {
-    position: 'absolute',
-    top: 74,
-    left: 20,
-    right: 20,
-    height: 1,
-    backgroundColor: '#E0E0E0',
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  mapPointIcon: {
-    position: 'absolute',
-    top: 18,
-    left: 20,
-    width: 38,
-    height: 38,
+  locationTextGroup: {
+    flex: 1,
+    marginLeft: 12,
+    marginRight: 12,
   },
   locationName: {
-    position: 'absolute',
-    top: 18,
-    left: 70,
-    right: 38,
     color: '#000000',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 17,
-    lineHeight: 15,
+    lineHeight: 18,
     fontWeight: '700',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   locationRegion: {
-    position: 'absolute',
-    top: 40,
-    left: 70,
-    right: 38,
     color: '#000000',
     fontFamily: 'AvantGarde Tx',
     fontSize: 17,
-    lineHeight: 15,
+    lineHeight: 18,
     fontWeight: '400',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
-  locationChevron: {
-    position: 'absolute',
-    top: 27.5,
-    right: 20,
+  cardDivider: {
+    height: 1,
+    marginVertical: 12,
+    backgroundColor: '#E0E0E0',
   },
-  monitoringIcon: {
-    position: 'absolute',
-    top: 96,
-    left: 20,
-    width: 28,
-    height: 28,
+  monitoringTextGroup: {
+    flex: 1,
+    marginLeft: 22,
   },
   monitoringLabel: {
-    position: 'absolute',
-    top: 88,
-    left: 70,
     color: '#000000',
     fontFamily: 'AvantGarde Tx',
     fontSize: 17,
@@ -96,9 +89,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   monitoringDate: {
-    position: 'absolute',
-    top: 110,
-    left: 70,
     color: '#000000',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 17,

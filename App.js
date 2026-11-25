@@ -1,21 +1,15 @@
-import { useRef } from 'react';
-import { Animated, Dimensions, Easing, Image, Pressable, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BarChartIcon from './assets/icons/bar-chart.svg';
 import ChevronRightIcon from './assets/icons/chevron-right.svg';
 import ClipboardListIcon from './assets/icons/clipboard-list.svg';
 import GraduationCapIcon from './assets/icons/graduation-cap.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
-import NavBookIcon from './assets/icons/nav-book.svg';
-import NavHomeIcon from './assets/icons/nav-home.svg';
-import NavPantauIcon from './assets/icons/nav-search.svg';
-import NavProfileIcon from './assets/icons/nav-profile.svg';
 import NotificationIcon from './assets/icons/notification.svg';
-import { createStyles } from './App.styles';
+import { styles } from './App.styles';
 import RiverInfoCard from './RiverInfoCard';
-
-const { width: screenWidth } = Dimensions.get('window');
 
 const tabs = [
   { key: 'beranda' },
@@ -23,8 +17,6 @@ const tabs = [
   { key: 'edukasi' },
   { key: 'profil' },
 ];
-
-const styles = createStyles(screenWidth, tabs.length);
 
 const homeActions = [
   {
@@ -59,38 +51,102 @@ const homeActions = [
   },
 ];
 
+function useResponsiveMetrics() {
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const horizontalPadding = width < 360 ? 16 : 20;
+  const bottomNavClearance = Math.max(insets.bottom, 16) + 96;
+
+  return { insets, width, height, horizontalPadding, bottomNavClearance };
+}
+
 function HomeScreen() {
+  const { insets, width, height, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
+  const isCompactHeight = height < 720;
+  const heroGap = isCompactHeight ? 10 : Math.min(24, Math.round(height * 0.025));
+  const stackGap = isCompactHeight ? 12 : 16;
+  const cardTopMargin = Math.max(isCompactHeight ? 18 : 28, Math.min(130, height - 700));
+
   return (
-    <View style={styles.homeScreen}>
+    <ScrollView
+      style={styles.homeScreen}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={[
+        styles.homeScrollContent,
+        {
+          paddingTop: insets.top + (isCompactHeight ? 10 : 16),
+          paddingBottom: bottomNavClearance + 16,
+          paddingHorizontal: horizontalPadding,
+        },
+      ]}
+    >
       <Image
         source={require('./assets/images/river-illustration.png')}
-        style={styles.riverIllustration}
+        style={[
+          styles.riverIllustration,
+          {
+            top: insets.top + (isCompactHeight ? 36 : 52),
+            width: Math.min(width, 500),
+          },
+        ]}
         resizeMode="contain"
         accessibilityLabel="River illustration"
       />
-      <Text style={styles.greeting}>Halo, Penjelajah Sungai!</Text>
-      <Text style={styles.subtext}>Ayo kita jaga kualitas sungai-sungai di lingkungan kita!</Text>
-      <RiverInfoCard style={styles.infoCard} />
-      {homeActions.map(({ key, label, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
-        <Pressable key={key} style={[styles.actionButton, buttonStyle]} accessibilityRole="button">
-          <Icon width={iconWidth} height={iconHeight} color={iconColor} />
-          <Text style={[styles.actionButtonLabel, labelStyle]}>{label}</Text>
-          <ChevronRightIcon width={11} height={19} color={iconColor} style={styles.actionButtonChevron} />
-        </Pressable>
-      ))}
-    </View>
+      <View style={[styles.brand, { paddingHorizontal: width < 360 ? 0 : 4 }]}>
+        <Image source={require('./assets/water-drop.png')} style={styles.waterDrop} accessibilityLabel="Sahabat Sungai logo" />
+        <Text style={styles.brandName}>Sahabat{'\n'}Sungai</Text>
+        <NotificationIcon width={46} height={46} style={styles.brandNotificationIcon} accessibilityLabel="Notifikasi" />
+      </View>
+
+      <View style={[styles.heroTextGroup, { marginTop: heroGap }]}>
+        <Text style={styles.greeting}>Halo, Penjelajah Sungai!</Text>
+        <Text style={styles.subtext}>Ayo kita jaga kualitas sungai-sungai di lingkungan kita!</Text>
+      </View>
+
+      <View style={[styles.homeActionsStack, { marginTop: cardTopMargin, gap: stackGap }]}>
+        <RiverInfoCard />
+        <View style={styles.homeButtonsGroup}>
+          {homeActions.map(({ key, label, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
+            <Pressable key={key} style={[styles.actionButton, buttonStyle]} accessibilityRole="button">
+              <Icon width={iconWidth} height={iconHeight} color={iconColor} />
+              <Text style={[styles.actionButtonLabel, labelStyle]} numberOfLines={1} adjustsFontSizeToFit>
+                {label}
+              </Text>
+              <ChevronRightIcon width={11} height={19} color={iconColor} style={styles.actionButtonChevron} />
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 function PantauScreen() {
+  const { insets, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
+
   return (
-    <View style={styles.contentScreen}>
+    <ScrollView
+      style={styles.contentScreen}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={[
+        styles.contentScrollContent,
+        {
+          paddingTop: insets.top + 28,
+          paddingBottom: bottomNavClearance + 16,
+          paddingHorizontal: horizontalPadding + 4,
+        },
+      ]}
+    >
       <Text style={styles.pageTitle}>Pantau Sungai</Text>
       <Text style={styles.pageIntro}>Pilih lokasi untuk melihat kondisi sungai terkini.</Text>
       <View style={styles.statusCard}>
-        <MapPointIcon width={32} height={32} style={styles.statusIcon} />
-        <Text style={styles.statusTitle}>Sungai Temboro</Text>
-        <Text style={styles.statusDetail}>Cemorokandang, Malang</Text>
+        <View style={styles.statusHeader}>
+          <MapPointIcon width={32} height={32} />
+          <View>
+            <Text style={styles.statusTitle}>Sungai Temboro</Text>
+            <Text style={styles.statusDetail}>Cemorokandang, Malang</Text>
+          </View>
+        </View>
         <View style={styles.statusDivider} />
         <Text style={styles.statusLabel}>Status kualitas air</Text>
         <Text style={styles.statusValue}>Baik</Text>
@@ -98,13 +154,26 @@ function PantauScreen() {
       <Pressable style={styles.primaryButton} accessibilityRole="button">
         <Text style={styles.primaryButtonLabel}>Lihat Detail Monitoring</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
 function EdukasiScreen() {
+  const { insets, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
+
   return (
-    <View style={styles.contentScreen}>
+    <ScrollView
+      style={styles.contentScreen}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={[
+        styles.contentScrollContent,
+        {
+          paddingTop: insets.top + 28,
+          paddingBottom: bottomNavClearance + 16,
+          paddingHorizontal: horizontalPadding + 4,
+        },
+      ]}
+    >
       <Text style={styles.pageTitle}>Edukasi Sungai</Text>
       <Text style={styles.pageIntro}>Mulai dari kebiasaan kecil untuk menjaga sungai tetap bersih.</Text>
       <View style={styles.lessonCard}>
@@ -117,13 +186,26 @@ function EdukasiScreen() {
         <Text style={styles.lessonTitle}>Gunakan air secukupnya</Text>
         <Text style={styles.lessonDescription}>Kurangi limbah rumah tangga yang masuk ke saluran air.</Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 function ProfilScreen() {
+  const { insets, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
+
   return (
-    <View style={styles.contentScreen}>
+    <ScrollView
+      style={styles.contentScreen}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={[
+        styles.contentScrollContent,
+        {
+          paddingTop: insets.top + 28,
+          paddingBottom: bottomNavClearance + 16,
+          paddingHorizontal: horizontalPadding + 4,
+        },
+      ]}
+    >
       <View style={styles.profileAvatar}><Text style={styles.profileInitial}>P</Text></View>
       <Text style={styles.profileName}>Penjelajah Sungai</Text>
       <Text style={styles.profileRole}>Sahabat Sungai</Text>
@@ -135,7 +217,7 @@ function ProfilScreen() {
         <Text style={styles.profileItemTitle}>Pengaturan</Text>
         <Text style={styles.profileItemDetail}>Kelola informasi dan preferensi akun Anda.</Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -147,34 +229,28 @@ const screens = [
 ];
 
 export default function App() {
-  const pageOffset = useRef(new Animated.Value(0)).current;
+  const { width } = useWindowDimensions();
 
   return (
     <View style={styles.container}>
       <LinearGradient
         pointerEvents="none"
-        colors={['rgba(255, 255, 255, 0)', '#CDF1CA']}
-        locations={[0.0341, 0.243]}
+        colors={['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA']}
+        locations={[0, 0.24, 0.48, 0.7]}
         style={styles.lowerBackgroundGradient}
       />
-      <View style={styles.brand}>
-        <Image source={require('./assets/water-drop.png')} style={styles.waterDrop} accessibilityLabel="Sahabat Sungai logo" />
-        <Text style={styles.brandName}>Sahabat{'\n'}Sungai</Text>
-        <NotificationIcon width={46} height={46} style={styles.brandNotificationIcon} accessibilityLabel="Notifikasi" />
-      </View>
 
       <View style={styles.pageViewport}>
-        <Animated.View style={[styles.pageTrack, { transform: [{ translateX: pageOffset }] }]}>
+        <View style={[styles.pageTrack, { width: width * tabs.length }]}>
           {screens.map((screen, index) => (
-            <View key={tabs[index].key} style={styles.page}>
+            <View key={tabs[index].key} style={[styles.page, { width }]}>
               {screen}
             </View>
           ))}
-        </Animated.View>
+        </View>
       </View>
 
       <StatusBar style="auto" />
     </View>
   );
 }
-
