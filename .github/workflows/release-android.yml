@@ -53,6 +53,35 @@ jobs:
       - name: Run lint
         run: npx expo lint
 
+      - name: Sync manifest versions to release tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const version = process.env.TAG.replace(/^v/, "");
+            const [major, minor, patch] = version.split(/[-+]/)[0].split(".").map(Number);
+            const versionCode = major * 10000 + minor * 100 + patch;
+
+            const updateJson = (path, mutate) => {
+              const data = JSON.parse(fs.readFileSync(path, "utf8"));
+              mutate(data);
+              fs.writeFileSync(path, JSON.stringify(data, null, 2) + "\n");
+            };
+
+            updateJson("package.json", (pkg) => {
+              pkg.version = version;
+            });
+            updateJson("package-lock.json", (lock) => {
+              lock.version = version;
+              if (lock.packages?.[""]) lock.packages[""].version = version;
+            });
+            updateJson("app.json", (cfg) => {
+              cfg.expo.version = version;
+              cfg.expo.android = { ...(cfg.expo.android || {}), versionCode };
+            });
+          '
+
       - name: Generate the Android project
         run: CI=1 npx expo prebuild --platform android --no-install
 
