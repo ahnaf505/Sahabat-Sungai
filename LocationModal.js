@@ -5,43 +5,46 @@ import MapPointIcon from './assets/icons/map-point.svg';
 
 export const riverLocations = [
   // Malang Raya (top of list)
-  { name: 'Sungai Temboro Cemorokandang', region: 'Malang, Jawa Timur' },
-  { name: 'Sungai Brantas', region: 'Kedungkandang, Malang, Jawa Timur' },
-  { name: 'Sungai Bango', region: 'Kedungkandang, Malang, Jawa Timur' },
-  { name: 'Sungai Amprong', region: 'Kedungkandang, Malang, Jawa Timur' },
-  { name: 'Sungai Metro', region: 'Sukun, Malang, Jawa Timur' },
-  { name: 'Sungai Mewek', region: 'Lowokwaru, Malang, Jawa Timur' },
-  { name: 'Sungai Sukun', region: 'Sukun, Malang, Jawa Timur' },
-  { name: 'Sungai Sari', region: 'Blimbing, Malang, Jawa Timur' },
-  { name: 'Sungai Lesti', region: 'Turen, Kab. Malang, Jawa Timur' },
-  { name: 'Sungai Konto', region: 'Pujon, Kab. Malang, Jawa Timur' },
-  { name: 'Sungai Molek', region: 'Kepanjen, Kab. Malang, Jawa Timur' },
-  { name: 'Sungai Sumberbrantas', region: 'Bumiaji, Batu, Jawa Timur' },
-  { name: 'Sungai Lahor', region: 'Sumberpucung, Kab. Malang, Jawa Timur' },
-  { name: 'Sungai Bambang', region: 'Wajak, Kab. Malang, Jawa Timur' },
+  { name: 'Sungai Temboro Cemorokandang', region: 'Malang, Jawa Timur', latitude: -7.9805, longitude: 112.6853 },
+  { name: 'Sungai Brantas', region: 'Kedungkandang, Malang, Jawa Timur', latitude: -7.9718, longitude: 112.6544 },
+  { name: 'Sungai Bango', region: 'Kedungkandang, Malang, Jawa Timur', latitude: -7.9139, longitude: 112.6566 },
+  { name: 'Sungai Amprong', region: 'Kedungkandang, Malang, Jawa Timur', latitude: -7.9667, longitude: 112.65 },
+  { name: 'Sungai Metro', region: 'Sukun, Malang, Jawa Timur', latitude: -8.005, longitude: 112.6186 },
+  { name: 'Sungai Mewek', region: 'Lowokwaru, Malang, Jawa Timur', latitude: -7.8922, longitude: 112.5822 },
+  { name: 'Sungai Sukun', region: 'Sukun, Malang, Jawa Timur', latitude: -8.005, longitude: 112.6186 },
+  { name: 'Sungai Sari', region: 'Blimbing, Malang, Jawa Timur', latitude: -7.9304, longitude: 112.652 },
+  { name: 'Sungai Lesti', region: 'Turen, Kab. Malang, Jawa Timur', latitude: -8.1667, longitude: 112.7 },
+  { name: 'Sungai Konto', region: 'Pujon, Kab. Malang, Jawa Timur', latitude: -7.8433, longitude: 112.4689 },
+  { name: 'Sungai Molek', region: 'Kepanjen, Kab. Malang, Jawa Timur', latitude: -8.1319, longitude: 112.5614 },
+  { name: 'Sungai Sumberbrantas', region: 'Bumiaji, Batu, Jawa Timur', latitude: -7.7572, longitude: 112.5281 },
+  { name: 'Sungai Lahor', region: 'Sumberpucung, Kab. Malang, Jawa Timur', latitude: -8.15, longitude: 112.425 },
+  { name: 'Sungai Bambang', region: 'Wajak, Kab. Malang, Jawa Timur', latitude: -8.125, longitude: 112.725 },
   // Jawa Timur & sekitarnya
-  { name: 'Sungai Welang', region: 'Pasuruan, Jawa Timur' },
-  { name: 'Sungai Rejoso', region: 'Pasuruan, Jawa Timur' },
-  { name: 'Sungai Porong', region: 'Sidoarjo, Jawa Timur' },
-  { name: 'Sungai Kali Mas', region: 'Surabaya, Jawa Timur' },
-  { name: 'Sungai Kali Surabaya', region: 'Surabaya, Jawa Timur' },
-  { name: 'Sungai Ngrowo', region: 'Tulungagung, Jawa Timur' },
-  { name: 'Sungai Bedadung', region: 'Jember, Jawa Timur' },
-  { name: 'Sungai Sampean', region: 'Situbondo, Jawa Timur' },
-  { name: 'Sungai Bajulmati', region: 'Banyuwangi, Jawa Timur' },
-  { name: 'Sungai Bengawan Solo', region: 'Bojonegoro, Jawa Timur' },
-  { name: 'Sungai Madiun', region: 'Madiun, Jawa Timur' },
+  { name: 'Sungai Welang', region: 'Pasuruan, Jawa Timur', latitude: -7.5781, longitude: 112.8706 },
+  { name: 'Sungai Rejoso', region: 'Pasuruan, Jawa Timur', latitude: -7.6814, longitude: 112.9567 },
+  { name: 'Sungai Porong', region: 'Sidoarjo, Jawa Timur', latitude: -7.5397, longitude: 112.6856 },
+  { name: 'Sungai Kali Mas', region: 'Surabaya, Jawa Timur', latitude: -7.2353, longitude: 112.7361 },
+  { name: 'Sungai Kali Surabaya', region: 'Surabaya, Jawa Timur', latitude: -7.3375, longitude: 112.7542 },
+  { name: 'Sungai Ngrowo', region: 'Tulungagung, Jawa Timur', latitude: -8.07, longitude: 111.8944 },
+  { name: 'Sungai Bedadung', region: 'Jember, Jawa Timur', latitude: -8.1408, longitude: 113.7342 },
+  { name: 'Sungai Sampean', region: 'Situbondo, Jawa Timur', latitude: -7.7, longitude: 113.9833 },
+  { name: 'Sungai Bajulmati', region: 'Banyuwangi, Jawa Timur', latitude: -7.9125, longitude: 114.3542 },
+  { name: 'Sungai Bengawan Solo', region: 'Bojonegoro, Jawa Timur', latitude: -7.1354, longitude: 111.8311 },
+  { name: 'Sungai Madiun', region: 'Madiun, Jawa Timur', latitude: -7.63, longitude: 111.5231 },
   // Wilayah lebih jauh
-  { name: 'Sungai Progo', region: 'Sleman, DI Yogyakarta' },
-  { name: 'Sungai Code', region: 'Yogyakarta, DI Yogyakarta' },
-  { name: 'Sungai Serayu', region: 'Banyumas, Jawa Tengah' },
-  { name: 'Sungai Citarum', region: 'Bandung, Jawa Barat' },
-  { name: 'Sungai Ciliwung', region: 'Jakarta Selatan, DKI Jakarta' },
-  { name: 'Sungai Cisadane', region: 'Tangerang, Banten' },
+  { name: 'Sungai Progo', region: 'Sleman, DI Yogyakarta', latitude: -7.9822, longitude: 110.2028 },
+  { name: 'Sungai Code', region: 'Yogyakarta, DI Yogyakarta', latitude: -7.7833, longitude: 110.3667 },
+  { name: 'Sungai Serayu', region: 'Banyumas, Jawa Tengah', latitude: -7.4833, longitude: 109.2833 },
+  { name: 'Sungai Citarum', region: 'Bandung, Jawa Barat', latitude: -6.9175, longitude: 107.6191 },
+  { name: 'Sungai Ciliwung', region: 'Jakarta Selatan, DKI Jakarta', latitude: -6.2667, longitude: 106.85 },
+  { name: 'Sungai Cisadane', region: 'Tangerang, Banten', latitude: -6.1667, longitude: 106.6333 },
 ];
 
 const openInGoogleMaps = (location) => {
-  const query = encodeURIComponent(`${location.name}, ${location.region}`);
+  const query =
+    typeof location.latitude === 'number' && typeof location.longitude === 'number'
+      ? `${location.latitude},${location.longitude}`
+      : encodeURIComponent(`${location.name}, ${location.region}`);
   const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
   Linking.openURL(url).catch(() => {});
 };
