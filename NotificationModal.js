@@ -1,18 +1,14 @@
-import { Modal, Platform, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 
-/** Blank notification popup with blurred/dimmed backdrop and top-left back button. */
+/** Blank notification popup with translucent dark backdrop and top-left back button. */
 export default function NotificationModal({ visible, onClose }) {
   const { height } = useWindowDimensions();
   const cardHeight = Math.min(420, Math.round(height * 0.55));
 
   return (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <View style={styles.overlay}>
-        {Platform.OS === 'ios' ? (
-          <BlurView intensity={45} tint="dark" style={StyleSheet.absoluteFillObject} />
-        ) : null}
         <Pressable style={styles.scrim} onPress={onClose} />
         <View style={[styles.card, { height: cardHeight }]}>
           <Pressable
@@ -38,7 +34,7 @@ const styles = StyleSheet.create({
   },
   scrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   card: {
     width: '100%',
