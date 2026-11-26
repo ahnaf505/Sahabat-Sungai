@@ -25,7 +25,7 @@ export default function LocationModal({ visible, onClose, onSelect }) {
             onPress={onClose}
             style={styles.backButton}
           >
-            <ArrowLeftIcon width={25} height={25} color="#FFFFFF" />
+            <ArrowLeftIcon width={25} height={25} color="#000000" />
           </Pressable>
           <Text style={styles.title}>Pilih Lokasi Sungai</Text>
           <ScrollView style={styles.locationScrollView} showsVerticalScrollIndicator contentContainerStyle={styles.locationList}>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     maxWidth: 460,
     padding: 20,
     borderRadius: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    backgroundColor: '#FFFFFF',
     boxShadow: '0px 4px 4px 0px #00000040',
   },
   backButton: {
@@ -76,13 +76,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 27.5,
-    backgroundColor: 'rgba(0, 0, 0, 0.32)',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: '#0000000D',
   },
   title: {
     marginTop: 18,
-    color: '#FFFFFF',
+    color: '#000000',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 22,
     lineHeight: 27,
@@ -100,14 +100,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+    borderBottomColor: '#E0E0E0',
   },
   locationTextGroup: {
     flex: 1,
     marginLeft: 14,
   },
   locationName: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 16,
     lineHeight: 20,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   locationRegion: {
     marginTop: 3,
-    color: '#FFFFFF',
+    color: '#000000',
     fontFamily: 'AvantGarde Tx',
     fontSize: 14,
     lineHeight: 18,
