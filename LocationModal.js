@@ -4,9 +4,9 @@ import MapPointIcon from './assets/icons/map-point.svg';
 
 export const riverLocations = [
   { name: 'Sungai Temboro Cemorokandang', region: 'Malang, Jawa Timur' },
-  { name: 'Sungai Brantas', region: 'Malang, Jawa Timur' },
-  { name: 'Sungai Citarum', region: 'Bandung, Jawa Barat' },
-  { name: 'Sungai Code', region: 'Yogyakarta, DI Yogyakarta' },
+  { name: 'Sungai Brantas', region: 'Kedungkandang, Malang, Jawa Timur' },
+  { name: 'Sungai Bango', region: 'Kedungkandang, Malang, Jawa Timur' },
+  { name: 'Sungai Amprong', region: 'Kedungkandang, Malang, Jawa Timur' },
 ];
 
 /** Lets the user select the river shown on the home monitoring card. */
