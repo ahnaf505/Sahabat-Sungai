@@ -1,4 +1,4 @@
-import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 
 /** Blank notification popup with translucent dark backdrop and top-left back button. */
@@ -7,10 +7,9 @@ export default function NotificationModal({ visible, onClose }) {
   const cardHeight = Math.min(420, Math.round(height * 0.55));
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <Pressable style={styles.scrim} onPress={onClose} />
-        <View style={[styles.card, { height: cardHeight }]}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Tutup notifikasi" onPress={onClose} style={styles.overlay}>
+        <Pressable onPress={(event) => event.stopPropagation()} style={[styles.card, { height: cardHeight }]}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Kembali"
@@ -19,8 +18,8 @@ export default function NotificationModal({ visible, onClose }) {
           >
             <ArrowLeftIcon width={25} height={25} color="#000000" />
           </Pressable>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -31,9 +30,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-  },
-  scrim: {
-    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   card: {
