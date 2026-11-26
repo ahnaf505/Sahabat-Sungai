@@ -157,6 +157,11 @@ function DonutChart({ data, size = 126, thickness = 26, gapDegrees = 2 }) {
 export default function AnalisisScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const isCompact = width < 380;
+  const waterDropSize = isCompact ? 86 : 104;
+  const warningBadgeSize = isCompact ? 31 : 37;
+  const donutSize = isCompact ? 104 : 126;
+  const cardPadding = isCompact ? 18 : 26;
 
   return (
     <View style={styles.screen}>
@@ -169,9 +174,14 @@ export default function AnalisisScreen() {
           style={styles[styleKey]}
         />
       ))}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
+      <View
+        style={[
+          styles.stickyHeader,
+          {
+            paddingTop: insets.top + 16,
+            paddingHorizontal: width < 360 ? 16 : 24,
+          },
+        ]}
       >
         <View style={styles.headerRow}>
           <Pressable accessibilityRole="button" accessibilityLabel="Kembali" onPress={() => router.replace('/')} style={styles.backButton}>
@@ -180,12 +190,17 @@ export default function AnalisisScreen() {
           <Text style={styles.title}>Analisis Sungai</Text>
           <BarChartIcon width={31} height={31} color="#005E36" style={styles.rightIcon} />
         </View>
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.content, { paddingTop: 0, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
+      >
 
 
         <View style={styles.summaryCard}>
-          <View style={styles.waterMarkBox}>
-            <WaterDropIcon width={104} height={104} accessibilityLabel="Status kualitas air" />
-            <WarningBadgeIcon width={37} height={37} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
+          <View style={[styles.waterMarkBox, { width: waterDropSize, height: waterDropSize }]}>
+            <WaterDropIcon width={waterDropSize} height={waterDropSize} accessibilityLabel="Status kualitas air" />
+            <WarningBadgeIcon width={warningBadgeSize} height={warningBadgeSize} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
           </View>
           <View style={styles.summaryContent}>
             <Text style={styles.ikaLabel}>IKA</Text>
@@ -212,15 +227,15 @@ export default function AnalisisScreen() {
 
 
 
-        <View style={styles.card}>
+        <View style={[styles.card, { padding: cardPadding }]}>
           <View style={styles.cardHeading}><PieChartIcon width={32} height={32} accessibilityLabel="Komposisi organisme" /><Text style={styles.cardTitle}>Komposisi Organisme</Text></View>
           <View style={styles.compositionContent}>
-            <DonutChart data={organismRows} />
+            <DonutChart data={organismRows} size={donutSize} thickness={isCompact ? 22 : 26} />
             <View style={styles.legend}>
               {organismRows.map(({ label, percentage, color }) => (
                 <View key={label} style={styles.legendRow}>
                   <View style={[styles.legendDot, { backgroundColor: color }]} />
-                  <Text style={styles.legendLabel}>{label}</Text>
+                  <Text style={styles.legendLabel} numberOfLines={1} adjustsFontSizeToFit>{label}</Text>
                   <Text style={styles.legendValue}>{`${percentage}%`}</Text>
                 </View>
               ))}
@@ -228,14 +243,14 @@ export default function AnalisisScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View style={[styles.card, { padding: cardPadding }]}>
           <View style={styles.cardHeading}><LabFlaskIcon width={24} height={28} accessibilityLabel="Parameter pendukung" /><Text style={styles.cardTitle}>Parameter Pendukung</Text></View>
           <View style={styles.parameterGrid}>
-            <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue}>25 °C</Text></View>
+            <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>25 °C</Text></View>
             <View style={styles.divider} />
-            <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue}>6,8 – 7,6</Text></View>
+            <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>6,8 – 7,6</Text></View>
             <View style={styles.divider} />
-            <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue}>55,5 – 64 cm</Text></View>
+            <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>55,5 – 64 cm</Text></View>
           </View>
         </View>
       </ScrollView>
@@ -248,11 +263,12 @@ const styles = StyleSheet.create({
   topGradient: { position: 'absolute', top: 0, left: 0, right: 0, bottom: '42%' },
   bottomGradient: { position: 'absolute', top: '42%', left: 0, right: 0, bottom: 0 },
   content: { flexGrow: 1, width: '100%', maxWidth: 500, alignSelf: 'center' },
+  stickyHeader: { width: '100%', maxWidth: 500, alignSelf: 'center', paddingBottom: 16, zIndex: 10 },
   headerRow: { minHeight: 55, justifyContent: 'center', alignItems: 'center' },
   backButton: { position: 'absolute', left: 0, width: 55, height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 27.5, backgroundColor: '#FFFFFF' },
   rightIcon: { position: 'absolute', right: 0 },
   title: { paddingHorizontal: 64, color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 20, lineHeight: 20, letterSpacing: 0, paddingVertical: 2, textAlign: 'center' },
-  summaryCard: { width: '100%', minHeight: 160, marginTop: 16, paddingHorizontal: 16, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderRadius: 25, backgroundColor: '#FBEBD5' },
+  summaryCard: { width: '100%', minHeight: 160, marginTop: 2, paddingHorizontal: 16, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderRadius: 25, backgroundColor: '#FBEBD5' },
   waterMarkBox: { width: 104, height: 104, position: 'relative' },
   warningBadge: { position: 'absolute', left: 6, bottom: 4 },
   summaryContent: { flex: 1, marginLeft: 12, justifyContent: 'center' },

@@ -401,16 +401,11 @@ export default function InputObservationScreen({ onBack }) {
           style={styles[styleKey]}
         />
       ))}
-      <ScrollView
-        ref={scrollViewRef}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        contentContainerStyle={[
-          styles.content,
+      <View
+        style={[
+          styles.stickyHeader,
           {
             paddingTop: insets.top + 16,
-            paddingBottom: Math.max(insets.bottom, 16) + 130 + keyboardHeight,
             paddingHorizontal: width < 360 ? 16 : 24,
           },
         ]}
@@ -427,6 +422,21 @@ export default function InputObservationScreen({ onBack }) {
           <Text style={styles.title}>Input Pengamatan</Text>
           <SproutIcon width={30} height={29} color="#049E4C" style={styles.rightIcon} />
         </View>
+      </View>
+      <ScrollView
+        ref={scrollViewRef}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: 0,
+            paddingBottom: Math.max(insets.bottom, 16) + 130 + keyboardHeight,
+            paddingHorizontal: width < 360 ? 16 : 24,
+          },
+        ]}
+      >
         <View style={styles.body}>
           <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -543,7 +553,11 @@ export default function InputObservationScreen({ onBack }) {
                         style={[styles.parameterBox, isInvalid && styles.parameterBoxError]}
                       >
                         <View style={styles.parameterTopBox}>
-                          {label ? <Text style={styles.parameterLabel}>{label}</Text> : null}
+                          {label ? (
+                            <Text style={styles.parameterLabel} numberOfLines={1} adjustsFontSizeToFit>
+                              {label}
+                            </Text>
+                          ) : null}
                         </View>
                         <TextInput
                           style={[styles.parameterInput, isInvalid && styles.parameterInputError]}
@@ -744,6 +758,13 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
+  stickyHeader: {
+    maxWidth: 500,
+    width: '100%',
+    alignSelf: 'center',
+    paddingBottom: 16,
+    zIndex: 10,
+  },
   headerRow: {
     minHeight: 55,
     justifyContent: 'center',
@@ -770,7 +791,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    paddingTop: 16,
+    paddingTop: 2,
   },
   card: {
     flex: 1,
@@ -801,8 +822,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   stationBox: {
-    width: 100,
-    flexShrink: 1,
+    flex: 1,
     height: 53,
     alignItems: 'center',
     justifyContent: 'center',

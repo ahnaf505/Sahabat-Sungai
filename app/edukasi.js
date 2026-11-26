@@ -68,13 +68,11 @@ export default function EdukasiScreen() {
           style={styles[styleKey]}
         />
       ))}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.content,
+      <View
+        style={[
+          styles.stickyHeader,
           {
             paddingTop: insets.top + 16,
-            paddingBottom: Math.max(insets.bottom, 16) + 124,
             paddingHorizontal: width < 360 ? 14 : 20,
           },
         ]}
@@ -90,6 +88,18 @@ export default function EdukasiScreen() {
           </Pressable>
           <Text style={styles.headerTitle}>Kenali Bioindikator</Text>
         </View>
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: 0,
+            paddingBottom: Math.max(insets.bottom, 16) + 124,
+            paddingHorizontal: width < 360 ? 14 : 20,
+          },
+        ]}
+      >
         <View style={styles.card}>
           <View
             style={[
@@ -166,9 +176,15 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
+  stickyHeader: {
+    maxWidth: 460,
+    width: '100%',
+    alignSelf: 'center',
+    paddingBottom: 16,
+    zIndex: 10,
+  },
   headerRow: {
     minHeight: 55,
-    marginBottom: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
