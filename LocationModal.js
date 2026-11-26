@@ -141,10 +141,10 @@ const styles = StyleSheet.create({
   },
   locationScrollView: {
     flex: 1,
-    marginTop: 16,
+    marginTop: 8,
   },
   locationList: {
-    paddingTop: 12,
+    paddingTop: 8,
   },
   locationRow: {
     minHeight: 72,
