@@ -4,6 +4,26 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
+import BarChartIcon from '../assets/icons/bar-chart.svg';
+import WarningBadgeIcon from '../assets/icons/warning-badge.svg';
+import WaterDropIcon from '../assets/icons/water-drop.svg';
+
+
+const backgroundGradients = [
+  {
+    key: 'top',
+    colors: ['#CDF1CA', '#FFFFFF', '#FFFFFF', 'rgba(255, 255, 255, 0)'],
+    locations: [0.3, 0.52, 0.76, 1],
+    styleKey: 'topGradient',
+  },
+  {
+    key: 'bottom',
+    colors: ['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA'],
+    locations: [0, 0.24, 0.48, 0.7],
+    styleKey: 'bottomGradient',
+  },
+];
+
 
 const organismRows = [
   { label: 'Gastropoda', value: '40%', color: '#1AAEA9' },
@@ -11,13 +31,6 @@ const organismRows = [
   { label: 'Ephemeroptera', value: '30%', color: '#FAA61F' },
 ];
 
-function LeafIcon() {
-  return (
-    <Svg width={42} height={42} viewBox="0 0 42 42" fill="none">
-      <Path d="M35.7 5.4C22.5 6.1 11.5 11 8.8 20.7c-1.3 4.7.4 8.9 4.4 10.4 4.5 1.7 9.2-1.4 10.8-5.9-4.9.4-9 2-12.3 5.1 3.4-5.9 8.9-9.7 15.7-11.2-1.5 7.9-5.8 13.2-12.9 15.9l-1.1 4.1" stroke="#006B43" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
 
 function PieIcon() {
   return (
@@ -82,25 +95,41 @@ export default function AnalisisScreen() {
 
   return (
     <View style={styles.screen}>
-      <LinearGradient pointerEvents="none" colors={['#FFFFFF', '#FFFFFF', '#E4F9E4']} locations={[0, 0.72, 1]} style={StyleSheet.absoluteFill} />
+      {backgroundGradients.map(({ key, colors, locations, styleKey }) => (
+        <LinearGradient
+          key={key}
+          pointerEvents="none"
+          colors={colors}
+          locations={locations}
+          style={styles[styleKey]}
+        />
+      ))}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 10, paddingBottom: Math.max(insets.bottom, 16) + 118, paddingHorizontal: width < 360 ? 14 : 18 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
       >
-        <View style={styles.header}>
+        <View style={styles.headerRow}>
           <Pressable accessibilityRole="button" accessibilityLabel="Kembali" onPress={() => router.replace('/')} style={styles.backButton}>
-            <ArrowLeftIcon width={24} height={24} color="#006B43" />
+            <ArrowLeftIcon width={25} height={25} color="#000000" />
           </Pressable>
-          <Text style={styles.pageTitle}>Analisis Sungai</Text>
+          <Text style={styles.title}>Analisis Sungai</Text>
+          <BarChartIcon width={31} height={31} color="#005E36" style={styles.rightIcon} />
         </View>
 
-        <View style={styles.scoreCard}>
-          <LeafIcon />
-          <View style={styles.scoreCopy}>
-            <Text style={styles.cardEyebrow}>Keanekaragaman H’</Text>
-            <Text style={styles.score}>1,60</Text>
+
+        <View style={styles.summaryCard}>
+          <View style={styles.waterMarkBox}>
+            <WaterDropIcon width={104} height={104} accessibilityLabel="Status kualitas air" />
+            <WarningBadgeIcon width={37} height={37} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
           </View>
-          <View pointerEvents="none" style={styles.riverArt}><View style={styles.riverLine} /></View>
+          <View style={styles.summaryContent}>
+            <Text style={styles.ikaLabel}>IKA</Text>
+            <View style={styles.scoreRow}>
+              <Text style={styles.ikaScore} numberOfLines={1} adjustsFontSizeToFit>3,57</Text>
+              <View style={styles.statusBadge}><Text style={styles.statusBadgeText}>Kotor</Text></View>
+            </View>
+            <Text style={styles.summaryCaption}>Berdasarkan skor bioindikator makroinvertebrata</Text>
+          </View>
         </View>
 
         <View style={styles.card}>
