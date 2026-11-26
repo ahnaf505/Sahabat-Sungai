@@ -16,9 +16,8 @@ export default function LocationModal({ visible, onClose, onSelect }) {
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <Pressable style={styles.scrim} onPress={onClose} />
-        <View style={[styles.card, { height: cardHeight }]}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Tutup pemilih lokasi" onPress={onClose} style={styles.overlay}>
+        <Pressable onPress={(event) => event.stopPropagation()} style={[styles.card, { height: cardHeight }]}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Kembali"
@@ -45,8 +44,8 @@ export default function LocationModal({ visible, onClose, onSelect }) {
               </Pressable>
             ))}
           </ScrollView>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -58,9 +57,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  scrim: {
-    ...StyleSheet.absoluteFillObject,
   },
   card: {
     width: '100%',
