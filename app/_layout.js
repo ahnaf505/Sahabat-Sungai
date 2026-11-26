@@ -1,11 +1,24 @@
+import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { router, Stack, usePathname } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { BackHandler, StyleSheet, View } from 'react-native';
 import BottomNavigation from '../BottomNavigation';
 
 function AppNavigation() {
   const pathname = usePathname();
   const activeTab = pathname === '/input-observation' ? 'pantau' : pathname === '/edukasi' ? 'edukasi' : pathname === '/profil' ? 'profil' : 'beranda';
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (pathname !== '/') {
+        router.replace('/');
+        return true;
+      }
+      return false;
+    });
+
+    return () => subscription.remove();
+  }, [pathname]);
 
   const navigateToTab = (tab) => {
     if (tab.key !== activeTab) router.replace(tab.path);
