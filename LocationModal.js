@@ -49,8 +49,14 @@ const openInGoogleMaps = (location) => {
   Linking.openURL(url).catch(() => {});
 };
 
-/** Lets the user select the river shown on the home monitoring card. */
-export default function LocationModal({ visible, onClose, onSelect }) {
+/** Lets the user select a river location from the provided list. */
+export default function LocationModal({
+  visible,
+  onClose,
+  onSelect,
+  selectedLocation = null,
+  locations = riverLocations,
+}) {
   const { height } = useWindowDimensions();
   const cardHeight = Math.min(560, Math.round(height * 0.72));
 
@@ -70,32 +76,37 @@ export default function LocationModal({ visible, onClose, onSelect }) {
             <Text style={styles.title}>Pilih Lokasi Sungai</Text>
           </View>
           <ScrollView style={styles.locationScrollView} showsVerticalScrollIndicator contentContainerStyle={styles.locationList}>
-            {riverLocations.map((location) => (
-              <Pressable
-                key={location.name}
-                accessibilityRole="button"
-                accessibilityLabel={`${location.name}, ${location.region}`}
-                onPress={() => onSelect(location)}
-                style={styles.locationRow}
-              >
-                <MapPointIcon width={32} height={32} accessibilityLabel="" />
-                <View style={styles.locationTextGroup}>
-                  <Text style={styles.locationName}>{location.name}</Text>
-                  <Text style={styles.locationRegion}>{location.region}</Text>
-                </View>
+            {locations.map((location) => {
+              const isSelected = selectedLocation?.name === location.name;
+
+              return (
                 <Pressable
+                  key={location.name}
                   accessibilityRole="button"
-                  accessibilityLabel={`Buka ${location.name} di Google Maps`}
-                  onPress={(event) => {
-                    event.stopPropagation?.();
-                    openInGoogleMaps(location);
-                  }}
-                  style={styles.mapButton}
+                  accessibilityState={{ selected: isSelected }}
+                  accessibilityLabel={`${location.name}, ${location.region}`}
+                  onPress={() => onSelect(location)}
+                  style={[styles.locationRow, isSelected && styles.locationRowSelected]}
                 >
-                  <MapIcon width={18} height={18} />
+                  <MapPointIcon width={32} height={32} accessibilityLabel="" />
+                  <View style={styles.locationTextGroup}>
+                    <Text style={[styles.locationName, isSelected && styles.locationNameSelected]}>{location.name}</Text>
+                    <Text style={styles.locationRegion}>{location.region}</Text>
+                  </View>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Buka ${location.name} di Google Maps`}
+                    onPress={(event) => {
+                      event.stopPropagation?.();
+                      openInGoogleMaps(location);
+                    }}
+                    style={styles.mapButton}
+                  >
+                    <MapIcon width={18} height={18} />
+                  </Pressable>
                 </Pressable>
-              </Pressable>
-            ))}
+              );
+            })}
           </ScrollView>
         </Pressable>
       </Pressable>
@@ -152,10 +163,15 @@ const styles = StyleSheet.create({
   locationRow: {
     minHeight: 72,
     paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+  },
+  locationRowSelected: {
+    backgroundColor: '#EDF7F0',
   },
   locationTextGroup: {
     flex: 1,
@@ -177,6 +193,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 20,
     fontWeight: '700',
+  },
+  locationNameSelected: {
+    color: '#005E36',
   },
   locationRegion: {
     marginTop: 3,
