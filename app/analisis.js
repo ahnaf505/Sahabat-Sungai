@@ -7,6 +7,17 @@ import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
 import BarChartIcon from '../assets/icons/bar-chart.svg';
 import WarningBadgeIcon from '../assets/icons/warning-badge.svg';
 import WaterDropIcon from '../assets/icons/water-drop.svg';
+import DiversityLeafIcon from '../assets/icons/diversity-leaf.svg';
+import LabFlaskIcon from '../assets/icons/lab-flask.svg';
+import PhDropIcon from '../assets/icons/ph-drop.svg';
+import PieChartIcon from '../assets/icons/pie-chart.svg';
+import SunIcon from '../assets/icons/sun.svg';
+import ThermometerIcon from '../assets/icons/thermometer.svg';
+import BiodiversityFillIcon from '../assets/icons/biodiversity-fill.svg';
+import BiodiversityLineIcon from '../assets/icons/biodiversity-line.svg';
+
+
+
 
 
 const backgroundGradients = [
@@ -25,66 +36,120 @@ const backgroundGradients = [
 ];
 
 
-const organismRows = [
-  { label: 'Gastropoda', value: '40%', color: '#1AAEA9' },
-  { label: 'Odonata', value: '30%', color: '#F85A4F' },
-  { label: 'Ephemeroptera', value: '30%', color: '#FAA61F' },
+const hslToHex = (hue, saturation, lightness) => {
+  const s = saturation / 100;
+  const l = lightness / 100;
+  const k = (n) => (n + hue / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const toHex = (x) => Math.round(x * 255).toString(16).padStart(2, '0');
+  return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`.toUpperCase();
+};
+
+const getHighContrastColor = (index, total) => {
+  const count = Math.max(total, 1);
+  const half = Math.ceil(count / 2);
+  const colorSlot = index % 2 === 0 ? index / 2 : half + Math.floor(index / 2);
+  const hue = (355 + (colorSlot * 360) / count) % 360;
+  const isWarmAmber = hue >= 35 && hue <= 75;
+  const saturation = isWarmAmber ? 92 : index % 2 === 0 ? 80 : 84;
+  const lightness = isWarmAmber ? 45 : index % 2 === 0 ? 44 : 40;
+  return hslToHex(hue, saturation, lightness);
+};
+
+const baseOrganismRows = [
+  { label: 'Gastropoda', percentage: 28 },
+  { label: 'Odonata', percentage: 22 },
+  { label: 'Ephemeroptera', percentage: 18 },
+  { label: 'Trichoptera', percentage: 14 },
+  { label: 'Diptera', percentage: 10 },
+  { label: 'Coleoptera', percentage: 8 },
 ];
 
+const organismRows = baseOrganismRows.map((item, index, list) => ({
+  ...item,
+  color: getHighContrastColor(index, list.length),
+}));
 
-function PieIcon() {
-  return (
-    <Svg width={46} height={46} viewBox="0 0 46 46">
-      <Path d="M21 2.5A20.5 20.5 0 1 0 43.5 25H21V2.5Z" fill="#006B43" />
-      <Path d="M25 2.5v17.8h18A20.5 20.5 0 0 0 25 2.5Z" fill="#006B43" />
-      <Path d="M23 1v22h22" stroke="#FFF" strokeWidth={2.5} />
-    </Svg>
-  );
+
+
+function polarToCartesian(cx, cy, radius, angleInDegrees) {
+  const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
+  return {
+    x: cx + radius * Math.cos(angleInRadians),
+    y: cy + radius * Math.sin(angleInRadians),
+  };
 }
 
-function FlaskIcon() {
-  return (
-    <Svg width={39} height={43} viewBox="0 0 39 43" fill="none">
-      <Path d="M14 3h11M17 3v14L5.5 35.3A3 3 0 0 0 8.1 40h23.8a3 3 0 0 0 2.6-4.7L23 17V3" stroke="#006B43" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M10.7 32h17.6" stroke="#006B43" strokeWidth={3.5} strokeLinecap="round" />
-    </Svg>
-  );
+function createDonutSlicePath(cx, cy, outerR, innerR, startAngle, endAngle) {
+  const outerStart = polarToCartesian(cx, cy, outerR, startAngle);
+  const outerEnd = polarToCartesian(cx, cy, outerR, endAngle);
+  const innerEnd = polarToCartesian(cx, cy, innerR, endAngle);
+  const innerStart = polarToCartesian(cx, cy, innerR, startAngle);
+  const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+
+  return [
+    `M ${outerStart.x} ${outerStart.y}`,
+    `A ${outerR} ${outerR} 0 ${largeArcFlag} 1 ${outerEnd.x} ${outerEnd.y}`,
+    `L ${innerEnd.x} ${innerEnd.y}`,
+    `A ${innerR} ${innerR} 0 ${largeArcFlag} 0 ${innerStart.x} ${innerStart.y}`,
+    'Z',
+  ].join(' ');
 }
 
-function ThermometerIcon() {
-  return (
-    <Svg width={28} height={39} viewBox="0 0 28 39" fill="none">
-      <Path d="M11 5a3 3 0 0 1 6 0v18.6a8 8 0 1 1-6 0V5Z" stroke="#00734A" strokeWidth={2.5} />
-      <Path d="M14 15v14" stroke="#00734A" strokeWidth={2.5} strokeLinecap="round" />
-      <Circle cx="14" cy="31" r="3.2" fill="#00734A" />
-    </Svg>
-  );
-}
+function DonutChart({ data, size = 126, thickness = 26, gapDegrees = 2 }) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = size / 2 - 2;
+  const innerR = outerR - thickness;
+  const total = data.reduce((sum, item) => sum + item.percentage, 0);
 
-function HumidityIcon() {
-  return (
-    <Svg width={35} height={40} viewBox="0 0 35 40" fill="none">
-      <Path d="M17.5 2.5S4 17.8 4 26a13.5 13.5 0 1 0 27 0c0-8.2-13.5-23.5-13.5-23.5Z" fill="#78C9DE" />
-      <Path d="M23.5 30.5a7.5 7.5 0 0 1-8 3.4" stroke="#FFF" strokeWidth={2} strokeLinecap="round" />
-    </Svg>
-  );
-}
+  if (total <= 0) {
+    return (
+      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <Circle cx={cx} cy={cy} r={(outerR + innerR) / 2} fill="none" stroke="#E5E7EB" strokeWidth={thickness} />
+      </Svg>
+    );
+  }
 
-function SunIcon() {
-  return (
-    <Svg width={43} height={43} viewBox="0 0 43 43" fill="none">
-      <Circle cx="21.5" cy="21.5" r="8" fill="#FFC400" />
-      <Path d="M21.5 3v5M21.5 35v5M3 21.5h5M35 21.5h5M8.4 8.4l3.5 3.5M31.1 31.1l3.5 3.5M34.6 8.4l-3.5 3.5M11.9 31.1l-3.5 3.5" stroke="#FFC400" strokeWidth={3} strokeLinecap="round" />
-    </Svg>
-  );
-}
+  const activeSlices = data.filter((item) => item.percentage > 0);
+  if (activeSlices.length === 1) {
+    return (
+      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <Circle
+          cx={cx}
+          cy={cy}
+          r={(outerR + innerR) / 2}
+          fill="none"
+          stroke={activeSlices[0].color}
+          strokeWidth={thickness}
+        />
+      </Svg>
+    );
+  }
 
-function DonutChart() {
+  const slices = activeSlices.reduce((acc, item) => {
+    const previousEnd = acc.length > 0 ? acc[acc.length - 1].rawEnd : 0;
+    const sliceAngle = (item.percentage / total) * 360;
+    const rawEnd = previousEnd + sliceAngle;
+    acc.push({
+      ...item,
+      rawEnd,
+      startAngle: previousEnd + gapDegrees / 2,
+      endAngle: rawEnd - gapDegrees / 2,
+    });
+    return acc;
+  }, []);
+
   return (
-    <Svg width={126} height={126} viewBox="0 0 126 126">
-      <Circle cx="63" cy="63" r="46" fill="none" stroke="#1AAEA9" strokeWidth="27" strokeDasharray="91 198" strokeDashoffset="0" transform="rotate(-90 63 63)" />
-      <Circle cx="63" cy="63" r="46" fill="none" stroke="#F85A4F" strokeWidth="27" strokeDasharray="68 221" strokeDashoffset="-96" transform="rotate(-90 63 63)" />
-      <Circle cx="63" cy="63" r="46" fill="none" stroke="#FAA61F" strokeWidth="27" strokeDasharray="68 221" strokeDashoffset="-169" transform="rotate(-90 63 63)" />
+    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {slices.map(({ label, color, startAngle, endAngle }) => (
+        <Path
+          key={label}
+          d={createDonutSlicePath(cx, cy, outerR, innerR, startAngle, endAngle)}
+          fill={color}
+        />
+      ))}
     </Svg>
   );
 }
@@ -131,169 +196,91 @@ export default function AnalisisScreen() {
             <Text style={styles.summaryCaption}>Berdasarkan skor bioindikator makroinvertebrata</Text>
           </View>
         </View>
+        <View style={styles.detailCard}>
+          <View pointerEvents="none" style={styles.detailCardIllustration}>
+            <BiodiversityFillIcon width={154} height={47} style={styles.detailCardIllustrationFill} />
+            <BiodiversityLineIcon width={159} height={53} style={styles.detailCardIllustrationLine} />
+          </View>
+          <DiversityLeafIcon width={29} height={32} accessibilityLabel="Keanekaragaman" />
+          <View style={styles.detailCardTextGroup}>
+            <Text style={styles.detailCardTitle}>Keanekaragaman H’</Text>
+            <Text style={styles.detailCardScore}>1,60</Text>
+          </View>
+        </View>
+
+
+
+
 
         <View style={styles.card}>
-          <View style={styles.cardHeading}><PieIcon /><Text style={styles.cardTitle}>Komposisi Organisme</Text></View>
+          <View style={styles.cardHeading}><PieChartIcon width={32} height={32} accessibilityLabel="Komposisi organisme" /><Text style={styles.cardTitle}>Komposisi Organisme</Text></View>
           <View style={styles.compositionContent}>
-            <DonutChart />
+            <DonutChart data={organismRows} />
             <View style={styles.legend}>
-              {organismRows.map(({ label, value, color }) => (
+              {organismRows.map(({ label, percentage, color }) => (
                 <View key={label} style={styles.legendRow}>
                   <View style={[styles.legendDot, { backgroundColor: color }]} />
                   <Text style={styles.legendLabel}>{label}</Text>
-                  <Text style={styles.legendValue}>{value}</Text>
+                  <Text style={styles.legendValue}>{`${percentage}%`}</Text>
                 </View>
               ))}
             </View>
           </View>
         </View>
-        <View style={styles.detailCard} />
+
+        <View style={styles.card}>
+          <View style={styles.cardHeading}><LabFlaskIcon width={24} height={28} accessibilityLabel="Parameter pendukung" /><Text style={styles.cardTitle}>Parameter Pendukung</Text></View>
+          <View style={styles.parameterGrid}>
+            <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue}>25 °C</Text></View>
+            <View style={styles.divider} />
+            <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue}>6,8 – 7,6</Text></View>
+            <View style={styles.divider} />
+            <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue}>55,5 – 64 cm</Text></View>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  topGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: '42%',
-  },
-  bottomGradient: {
-    position: 'absolute',
-    top: '42%',
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  content: {
-    flexGrow: 1,
-    maxWidth: 500,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  headerRow: {
-    minHeight: 55,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    width: 55,
-    height: 55,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 27.5,
-    backgroundColor: '#FFFFFF',
-  },
-  rightIcon: {
-    position: 'absolute',
-    right: 0,
-  },
-  title: {
-    paddingHorizontal: 64,
-    textAlign: 'center',
-    color: '#000000',
-    fontFamily: 'Poppins-SemiBold',
-    fontWeight: '600',
-    fontSize: 20,
-    lineHeight: 20,
-    letterSpacing: 0,
-    paddingVertical: 2,
-  },
-  summaryCard: {
-    width: '100%',
-    minHeight: 160,
-    marginTop: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 25,
-    backgroundColor: '#FBEBD5',
-  },
-  waterMarkBox: {
-    width: 104,
-    height: 104,
-    position: 'relative',
-  },
-  warningBadge: {
-    position: 'absolute',
-    left: 6,
-    bottom: 4,
-  },
-  summaryContent: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'center',
-  },
-  ikaLabel: {
-    color: '#000000',
-    fontFamily: 'Poppins-SemiBold',
-    fontWeight: '600',
-    fontSize: 20,
-    lineHeight: 20,
-    letterSpacing: 0,
-    paddingVertical: 2,
-  },
-  scoreRow: {
-    marginTop: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  ikaScore: {
-    color: '#000000',
-    fontFamily: 'Poppins-SemiBold',
-    fontWeight: '600',
-    fontSize: 45,
-    lineHeight: 45,
-    letterSpacing: 0,
-    includeFontPadding: false,
-    flexShrink: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 22,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: '#C16500',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusBadgeText: {
-    color: '#FFFFFF',
-    fontFamily: 'Poppins-SemiBold',
-    fontWeight: '600',
-    fontSize: 20,
-    lineHeight: 20,
-    letterSpacing: 0,
-    paddingVertical: 2,
-  },
-  summaryCaption: {
-    marginTop: 2,
-    color: '#000000',
-    fontFamily: 'Poppins-Regular',
-    fontWeight: '400',
-    fontSize: 12.5,
-    lineHeight: 18,
-    letterSpacing: 0,
-    includeFontPadding: false,
-  },
-  detailCard: {
-    width: '100%',
-    height: 97,
-    marginTop: 16,
-    padding: 20,
-    borderRadius: 25,
-    backgroundColor: '#FFFFFF',
-    boxShadow: '0px 0px 5px 0px #00000040',
-  },
+  screen: { flex: 1, backgroundColor: '#FFFFFF' },
+  topGradient: { position: 'absolute', top: 0, left: 0, right: 0, bottom: '42%' },
+  bottomGradient: { position: 'absolute', top: '42%', left: 0, right: 0, bottom: 0 },
+  content: { flexGrow: 1, width: '100%', maxWidth: 500, alignSelf: 'center' },
+  headerRow: { minHeight: 55, justifyContent: 'center', alignItems: 'center' },
+  backButton: { position: 'absolute', left: 0, width: 55, height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 27.5, backgroundColor: '#FFFFFF' },
+  rightIcon: { position: 'absolute', right: 0 },
+  title: { paddingHorizontal: 64, color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 20, lineHeight: 20, letterSpacing: 0, paddingVertical: 2, textAlign: 'center' },
+  summaryCard: { width: '100%', minHeight: 160, marginTop: 16, paddingHorizontal: 16, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderRadius: 25, backgroundColor: '#FBEBD5' },
+  waterMarkBox: { width: 104, height: 104, position: 'relative' },
+  warningBadge: { position: 'absolute', left: 6, bottom: 4 },
+  summaryContent: { flex: 1, marginLeft: 12, justifyContent: 'center' },
+  ikaLabel: { color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 20, lineHeight: 20, paddingVertical: 2 },
+  scoreRow: { marginTop: 6, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
+  ikaScore: { color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 45, lineHeight: 45, includeFontPadding: false, flexShrink: 1 },
+  statusBadge: { paddingHorizontal: 22, paddingVertical: 8, borderRadius: 999, backgroundColor: '#C16500', alignItems: 'center', justifyContent: 'center' },
+  statusBadgeText: { color: '#FFFFFF', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 20, lineHeight: 20, paddingVertical: 2 },
+  summaryCaption: { marginTop: 2, color: '#000000', fontFamily: 'Poppins-Regular', fontWeight: '400', fontSize: 12.5, lineHeight: 18, includeFontPadding: false },
+  detailCard: { width: '100%', minHeight: 90, marginTop: 16, paddingHorizontal: 18, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', gap: 14, overflow: 'hidden', borderRadius: 25, backgroundColor: '#FFFFFF', boxShadow: '0px 0px 3px 0px #0000001F', elevation: 2 },
+  detailCardTextGroup: { flex: 1, justifyContent: 'center' },
+  detailCardIllustration: { position: 'absolute', right: -2, bottom: -2, width: 159, height: 53 },
+  detailCardIllustrationFill: { position: 'absolute', right: 0, bottom: 0 },
+  detailCardIllustrationLine: { position: 'absolute', right: 0, bottom: 0 },
+  detailCardTitle: { color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 15, lineHeight: 18, letterSpacing: 0 },
+  detailCardScore: { marginTop: 4, color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 35, lineHeight: 38, letterSpacing: 0, includeFontPadding: false },
+  card: { marginTop: 22, padding: 26, borderRadius: 30, backgroundColor: '#FFFFFF', boxShadow: '0px 0px 3px 0px #0000001F', elevation: 2 },
+  cardHeading: { flexDirection: 'row', alignItems: 'center', gap: 17 },
+  cardTitle: { color: '#101010', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 15, lineHeight: 15, letterSpacing: 0, includeFontPadding: false },
+  compositionContent: { marginTop: 16, flexDirection: 'row', alignItems: 'center' },
+  legend: { flex: 1, marginLeft: 16, gap: 10 },
+  legendRow: { flexDirection: 'row', alignItems: 'center' },
+  legendDot: { width: 14, height: 14, marginRight: 10, borderRadius: 7 },
+  legendLabel: { flex: 1, marginRight: 8, color: '#101010', fontFamily: 'Poppins-Regular', fontSize: 14, lineHeight: 18 },
+  legendValue: { color: '#101010', fontFamily: 'Poppins-SemiBold', fontSize: 14, lineHeight: 18 },
+  parameterGrid: { marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  parameter: { flex: 1, alignItems: 'center' },
+  divider: { width: StyleSheet.hairlineWidth, alignSelf: 'stretch', backgroundColor: '#777' },
+  parameterLabel: { marginTop: 5, color: '#101010', fontFamily: 'Poppins-Regular', fontSize: 12, lineHeight: 16 },
+  parameterValue: { marginTop: 2, color: '#101010', fontFamily: 'Poppins-Bold', fontSize: 13, lineHeight: 18, textAlign: 'center' },
 });
