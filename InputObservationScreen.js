@@ -1,8 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import {
+  Image,
+  Keyboard,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DatePickerModal, { formatIndonesianDate } from './DatePickerModal';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
@@ -32,14 +44,56 @@ const backgroundGradients = [
 
 const parameterRows = [
   [
-    { key: 'suhu', label: 'Suhu (°C)' },
-    { key: 'kedalaman', label: 'Kedalaman (cm)' },
+    { key: 'suhu', label: 'Suhu (°C)', allowNegative: true },
+    { key: 'kedalaman', label: 'Kedalaman (cm)', allowNegative: false },
   ],
   [
-    { key: 'kecerahan', label: 'Kecerahan (cm)' },
-    { key: 'ph', label: 'pH' },
+    { key: 'kecerahan', label: 'Kecerahan (cm)', allowNegative: false },
+    { key: 'ph', label: 'pH', allowNegative: false },
   ],
 ];
+
+const sanitizeNumericInput = (value, { allowNegative = false, maxDecimals = 2 } = {}) => {
+  let result = '';
+  let hasDecimal = false;
+  let decimalDigits = 0;
+
+  for (const char of value) {
+    if (char >= '0' && char <= '9') {
+      if (hasDecimal) {
+        if (decimalDigits >= maxDecimals) {
+          continue;
+        }
+        decimalDigits += 1;
+      }
+      result += char;
+    } else if (allowNegative && char === '-' && result.length === 0) {
+      result += char;
+    } else if ((char === '.' || char === ',') && !hasDecimal) {
+      hasDecimal = true;
+      result += char;
+    }
+  }
+
+  return result;
+};
+
+const parseNumericInput = (raw, { allowNegative = false, maxDecimals = 2 } = {}) => {
+  const normalized = (raw ?? '').trim().replace(',', '.');
+  const decimalPart = `\\.\\d{1,${maxDecimals}}`;
+  const pattern = new RegExp(
+    allowNegative
+      ? `^-?(?:\\d+(?:${decimalPart})?|${decimalPart})$`
+      : `^(?:\\d+(?:${decimalPart})?|${decimalPart})$`,
+  );
+
+  if (!pattern.test(normalized)) {
+    return null;
+  }
+
+  const numeric = Number(normalized);
+  return Number.isFinite(numeric) ? numeric : null;
+};
 
 const bioindicators = [
   {
@@ -58,45 +112,126 @@ const bioindicators = [
   },
 ];
 
+const STATIONS = [1, 2, 3];
 const INITIAL_COUNTS = { gastropoda: 0, odonata: 0 };
 const INITIAL_PARAMETERS = { suhu: '', kedalaman: '', kecerahan: '', ph: '' };
+const createInitialStationData = () => ({
+  counts: { ...INITIAL_COUNTS },
+  parameters: { ...INITIAL_PARAMETERS },
+});
+const createInitialObservations = () =>
+  Object.fromEntries(STATIONS.map((point) => [point, createInitialStationData()]));
+const getToday = () => {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+};
 
 export default function InputObservationScreen({ onBack }) {
   const [selectedPoint, setSelectedPoint] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(getToday);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
-  const [counts, setCounts] = useState(INITIAL_COUNTS);
-  const [parameters, setParameters] = useState(INITIAL_PARAMETERS);
+  const [observationsByPoint, setObservationsByPoint] = useState(createInitialObservations);
+  const [invalidFieldsByPoint, setInvalidFieldsByPoint] = useState({});
   const [feedbackModal, setFeedbackModal] = useState(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const scrollViewRef = useRef(null);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
+  const currentStationData = selectedPoint ? observationsByPoint[selectedPoint] : null;
+  const counts = currentStationData?.counts ?? INITIAL_COUNTS;
+  const parameters = currentStationData?.parameters ?? INITIAL_PARAMETERS;
+  const invalidFields = selectedPoint ? (invalidFieldsByPoint[selectedPoint] ?? {}) : {};
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSubscription = Keyboard.addListener(showEvent, (event) => {
+      setKeyboardHeight(event.endCoordinates?.height ?? 0);
+    });
+    const hideSubscription = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   const updateCount = (key, delta) => {
-    setCounts((prev) => ({
-      ...prev,
-      [key]: Math.max(0, (prev[key] ?? 0) + delta),
-    }));
+    if (!selectedPoint) {
+      return;
+    }
+
+    setObservationsByPoint((prev) => {
+      const station = prev[selectedPoint] ?? createInitialStationData();
+      return {
+        ...prev,
+        [selectedPoint]: {
+          ...station,
+          counts: {
+            ...station.counts,
+            [key]: Math.max(0, (station.counts[key] ?? 0) + delta),
+          },
+        },
+      };
+    });
+  };
+
+  const handleParameterKeyPress = (event, fieldKey, allowNegative) => {
+    const pressedKey = event.nativeEvent?.key ?? event.key;
+    const hasModifier = Boolean(
+      event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        event.nativeEvent?.ctrlKey ||
+        event.nativeEvent?.metaKey ||
+        event.nativeEvent?.altKey,
+    );
+
+    if (!pressedKey || pressedKey.length > 1 || hasModifier) {
+      return;
+    }
+
+    const current = parameters[fieldKey] ?? '';
+    const target = event.target;
+    const start = typeof target?.selectionStart === 'number' ? target.selectionStart : current.length;
+    const end = typeof target?.selectionEnd === 'number' ? target.selectionEnd : current.length;
+    const nextValue = current.slice(0, start) + pressedKey + current.slice(end);
+
+    if (sanitizeNumericInput(nextValue, { allowNegative }) !== nextValue) {
+      event.preventDefault?.();
+    }
   };
 
   const handleSave = () => {
     const missingFields = [];
+    const nextInvalidFieldsByPoint = {};
 
-    if (!selectedPoint) {
-      missingFields.push('Titik Pengamatan');
-    }
     if (!selectedDate) {
       missingFields.push('Tanggal Pengamatan');
     }
 
-    for (const { key, label } of parameterRows.flat()) {
-      const raw = (parameters[key] ?? '').trim();
-      const numeric = Number(raw.replace(',', '.'));
-      if (!raw || Number.isNaN(numeric)) {
-        missingFields.push(label);
+    for (const point of STATIONS) {
+      const stationParams = observationsByPoint[point]?.parameters ?? INITIAL_PARAMETERS;
+      const pointInvalidFields = {};
+
+      for (const { key, label, allowNegative } of parameterRows.flat()) {
+        if (parseNumericInput(stationParams[key], { allowNegative }) === null) {
+          missingFields.push(`Titik ${point}: ${label}`);
+          pointInvalidFields[key] = true;
+        }
+      }
+
+      if (Object.keys(pointInvalidFields).length > 0) {
+        nextInvalidFieldsByPoint[point] = pointInvalidFields;
       }
     }
 
     if (missingFields.length > 0) {
+      setInvalidFieldsByPoint(nextInvalidFieldsByPoint);
       setFeedbackModal({
         type: 'error',
         title: 'Data Belum Lengkap',
@@ -105,10 +240,10 @@ export default function InputObservationScreen({ onBack }) {
       return;
     }
 
-    setSelectedPoint(null);
-    setSelectedDate(null);
-    setCounts(INITIAL_COUNTS);
-    setParameters(INITIAL_PARAMETERS);
+    setSelectedPoint(1);
+    setSelectedDate(getToday());
+    setObservationsByPoint(createInitialObservations());
+    setInvalidFieldsByPoint({});
     setFeedbackModal({
       type: 'success',
       title: 'Data Tersimpan',
@@ -128,12 +263,15 @@ export default function InputObservationScreen({ onBack }) {
         />
       ))}
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         contentContainerStyle={[
           styles.content,
           {
             paddingTop: insets.top + 16,
-            paddingBottom: Math.max(insets.bottom, 16) + 130,
+            paddingBottom: Math.max(insets.bottom, 16) + 130 + keyboardHeight,
             paddingHorizontal: width < 360 ? 16 : 24,
           },
         ]}
@@ -157,7 +295,7 @@ export default function InputObservationScreen({ onBack }) {
               <Text style={styles.cardHeaderTitle}>Titik Pengamatan</Text>
             </View>
             <View style={styles.stationRow}>
-              {[1, 2, 3].map((point) => {
+              {STATIONS.map((point) => {
                 const isSelected = selectedPoint === point;
 
                 return (
@@ -253,20 +391,66 @@ export default function InputObservationScreen({ onBack }) {
             <View style={styles.parameterGrid}>
               {parameterRows.map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.parameterRow}>
-                  {row.map(({ key, label }) => (
-                    <View key={key} style={styles.parameterBox}>
-                      <View style={styles.parameterTopBox}>
-                        {label ? <Text style={styles.parameterLabel}>{label}</Text> : null}
+                  {row.map(({ key, label, allowNegative }) => {
+                    const isInvalid = Boolean(invalidFields[key]);
+
+                    return (
+                      <View
+                        key={key}
+                        style={[styles.parameterBox, isInvalid && styles.parameterBoxError]}
+                      >
+                        <View style={styles.parameterTopBox}>
+                          {label ? <Text style={styles.parameterLabel}>{label}</Text> : null}
+                        </View>
+                        <TextInput
+                          style={[styles.parameterInput, isInvalid && styles.parameterInputError]}
+                          value={parameters[key]}
+                          editable={Boolean(selectedPoint)}
+                          onKeyPress={(event) => handleParameterKeyPress(event, key, allowNegative)}
+                          onChangeText={(value) => {
+                            if (!selectedPoint) {
+                              return;
+                            }
+
+                            const sanitized = sanitizeNumericInput(value, { allowNegative });
+                            setObservationsByPoint((prev) => {
+                              const station = prev[selectedPoint] ?? createInitialStationData();
+                              return {
+                                ...prev,
+                                [selectedPoint]: {
+                                  ...station,
+                                  parameters: {
+                                    ...station.parameters,
+                                    [key]: sanitized,
+                                  },
+                                },
+                              };
+                            });
+                            if (invalidFields[key]) {
+                              setInvalidFieldsByPoint((prev) => ({
+                                ...prev,
+                                [selectedPoint]: {
+                                  ...(prev[selectedPoint] ?? {}),
+                                  [key]: false,
+                                },
+                              }));
+                            }
+                          }}
+                          keyboardType="decimal-pad"
+                          inputMode="decimal"
+                          autoCorrect={false}
+                          autoCapitalize="none"
+                          spellCheck={false}
+                          onFocus={() => {
+                            setTimeout(() => {
+                              scrollViewRef.current?.scrollToEnd({ animated: true });
+                            }, 100);
+                          }}
+                          accessibilityLabel={label}
+                        />
                       </View>
-                      <TextInput
-                        style={styles.parameterInput}
-                        value={parameters[key]}
-                        onChangeText={(value) => setParameters((prev) => ({ ...prev, [key]: value }))}
-                        keyboardType="decimal-pad"
-                        accessibilityLabel={label}
-                      />
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
               ))}
             </View>
@@ -524,6 +708,9 @@ const styles = StyleSheet.create({
     borderColor: '#C4C3C3',
     backgroundColor: '#FFFFFF',
   },
+  parameterBoxError: {
+    borderColor: '#B91C1C',
+  },
   parameterTopBox: {
     height: 26.31,
     paddingHorizontal: 12,
@@ -557,6 +744,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     includeFontPadding: false,
     textAlignVertical: 'center',
+  },
+  parameterInputError: {
+    borderColor: '#B91C1C',
   },
   sectionHeaderTitle: {
     ...poppinsSemiBold16,

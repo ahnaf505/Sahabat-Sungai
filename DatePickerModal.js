@@ -24,7 +24,7 @@ export function formatIndonesianDate(date) {
 }
 
 function isSameDay(a, b) {
-  return (
+  return Boolean(
     a &&
     b &&
     a.getFullYear() === b.getFullYear() &&
