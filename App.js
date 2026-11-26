@@ -100,6 +100,7 @@ function HomeScreen({ location, lastMonitoringDate, onOpenLocations, onOpenNotif
       contentContainerStyle={[
         styles.homeScrollContent,
         {
+          maxWidth: width >= 600 ? 720 : 520,
           paddingTop: insets.top + (isCompactHeight ? 10 : 16),
           paddingBottom: bottomNavClearance + 16,
           paddingHorizontal: horizontalPadding,
@@ -112,7 +113,7 @@ function HomeScreen({ location, lastMonitoringDate, onOpenLocations, onOpenNotif
           styles.riverIllustration,
           {
             top: insets.top + (isCompactHeight ? 36 : 52),
-            width: Math.min(width, 500),
+            width: Math.min(width, width >= 600 ? 680 : 500),
           },
         ]}
         resizeMode="contain"
@@ -136,7 +137,7 @@ function HomeScreen({ location, lastMonitoringDate, onOpenLocations, onOpenNotif
         <Text style={styles.subtext}>Ayo kita jaga kualitas sungai-sungai di lingkungan kita!</Text>
       </View>
 
-      <View style={[styles.homeActionsStack, { marginTop: cardTopMargin, gap: stackGap }]}>
+      <View style={[styles.homeActionsStack, { marginTop: cardTopMargin, gap: stackGap, maxWidth: width >= 600 ? 680 : 480 }]}>
         <RiverInfoCard
           location={location}
           lastMonitoringDate={lastMonitoringDate}

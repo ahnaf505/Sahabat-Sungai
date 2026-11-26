@@ -98,6 +98,7 @@ export default function ProfilScreen() {
           styles.stickyHeader,
           {
             paddingTop: insets.top + 16,
+            maxWidth: width >= 600 ? 720 : 500,
             paddingHorizontal: width < 360 ? 16 : 24,
           },
         ]}
@@ -122,6 +123,7 @@ export default function ProfilScreen() {
           styles.content,
           {
             paddingTop: 0,
+            maxWidth: width >= 600 ? 720 : 500,
             paddingBottom: Math.max(insets.bottom, 16) + 130,
             paddingHorizontal: width < 360 ? 16 : 24,
           },

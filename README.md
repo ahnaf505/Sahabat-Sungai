@@ -93,6 +93,12 @@ Tagging a semantic version on `main` (for example, `v0.1.0`) triggers [`.github/
 3. Generates the native Android project (`npx expo prebuild --platform android --no-install`).
 4. Builds a release APK (`./gradlew app:assembleRelease`), verifies `assets/index.android.bundle` is packaged inside, and publishes `Sahabat-Sungai-<tag>.apk` to GitHub Releases.
 
+## Phone and Tablet Layouts
+
+Phone layouts below 600 logical pixels retain their existing spacing and content widths. At 600 pixels and above, dashboard, input, analysis, and profile content use a centered column capped at 720 pixels; education uses a 600-pixel carousel. Tablet navigation targets spread across a wider central area without enlarging the icons. Observation cards size to their content on tablets rather than stretching to the screen height.
+
+The calendar's day cells shrink on compact phones. Education preserves the selected slide when its available width changes. The app remains portrait-oriented as configured in `app.json`.
+
 ## Education Image Credits
 
 Bioindicator photographs used in the education carousel:

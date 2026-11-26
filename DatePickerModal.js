@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
   },
   weekdayLabel: {
     width: 38,
+    flexShrink: 1,
     textAlign: 'center',
     color: '#6B7280',
     fontFamily: 'Poppins-Medium',
@@ -229,6 +230,7 @@ const styles = StyleSheet.create({
   },
   dayCell: {
     width: 38,
+    flexShrink: 1,
     height: 38,
     borderRadius: 19,
     alignItems: 'center',

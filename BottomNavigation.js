@@ -37,7 +37,7 @@ export default function BottomNavigation({ activeTab, onNavigate }) {
             accessibilityState={{ selected: isActive }}
             accessibilityLabel={label}
             onPress={() => onNavigate({ key, path })}
-            style={styles.tabButton}
+            style={[styles.tabButton, width >= 600 && { maxWidth: 140 }]}
           >
             <Icon width={36} height={34} color={isActive ? '#005E36' : '#8C8C8C'} />
             <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]} numberOfLines={1}>

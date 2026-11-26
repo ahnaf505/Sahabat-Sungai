@@ -138,7 +138,7 @@ export default function EdukasiScreen() {
   const { width } = useWindowDimensions();
   const carouselRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const shellWidth = Math.min(width, 460);
+  const shellWidth = Math.min(width, width >= 600 ? 600 : 460);
   const horizontalPadding = width < 360 ? 14 : 20;
   const slideWidth = shellWidth - horizontalPadding * 2;
 
@@ -166,6 +166,7 @@ export default function EdukasiScreen() {
           styles.header,
           {
             paddingTop: insets.top + 16,
+            maxWidth: width >= 600 ? 600 : 460,
             paddingHorizontal: horizontalPadding,
           },
         ]}
@@ -201,6 +202,7 @@ export default function EdukasiScreen() {
             snapToInterval={slideWidth}
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={updateActiveCard}
+            onContentSizeChange={() => carouselRef.current?.scrollTo({ x: activeIndex * slideWidth, animated: false })}
             contentContainerStyle={{ paddingHorizontal: horizontalPadding }}
             accessibilityRole="adjustable"
             accessibilityLabel="Kartu edukasi bioindikator"

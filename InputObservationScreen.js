@@ -450,6 +450,7 @@ export default function InputObservationScreen({ onBack }) {
         style={[
           styles.stickyHeader,
           {
+            maxWidth: width >= 600 ? 720 : 500,
             paddingTop: insets.top + 16,
             paddingHorizontal: width < 360 ? 16 : 24,
           },
@@ -476,14 +477,15 @@ export default function InputObservationScreen({ onBack }) {
         contentContainerStyle={[
           styles.content,
           {
+            maxWidth: width >= 600 ? 720 : 500,
             paddingTop: 0,
             paddingBottom: Math.max(insets.bottom, 16) + 130 + keyboardHeight,
             paddingHorizontal: width < 360 ? 16 : 24,
           },
         ]}
       >
-        <View style={styles.body}>
-          <View style={styles.card}>
+        <View style={[styles.body, width >= 600 && { flex: 0 }]}>
+          <View style={[styles.card, width >= 600 && { flex: 0 }]}>
             <View style={styles.cardHeader}>
               <MapPointIcon width={38} height={38} accessibilityLabel="Lokasi sungai" />
               <Text style={styles.cardHeaderTitle}>Titik Pengamatan</Text>

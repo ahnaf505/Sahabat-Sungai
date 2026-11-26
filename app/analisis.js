@@ -420,6 +420,7 @@ export default function AnalisisScreen({ analysisData = null }) {
           styles.stickyHeader,
           {
             paddingTop: insets.top + 16,
+            maxWidth: width >= 600 ? 720 : 500,
             paddingHorizontal: width < 360 ? 16 : 24,
           },
         ]}
@@ -434,7 +435,7 @@ export default function AnalisisScreen({ analysisData = null }) {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingTop: 0, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
+        contentContainerStyle={[styles.content, { maxWidth: width >= 600 ? 720 : 500, paddingTop: 0, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
       >
         {!effectiveAnalysis ? (
           <View style={[styles.emptyCard, { padding: cardPadding }]}>
