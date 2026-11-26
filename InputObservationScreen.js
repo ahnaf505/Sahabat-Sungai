@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import Storage from 'expo-sqlite/kv-store';
 import { StatusBar } from 'expo-status-bar';
 import {
   Image,
@@ -113,6 +114,7 @@ const bioindicators = [
 ];
 
 const STATIONS = [1, 2, 3];
+const OBSERVATION_DRAFT_STORAGE_KEY = 'pantau_observation_draft_v1';
 const INITIAL_COUNTS = { gastropoda: 0, odonata: 0 };
 const INITIAL_PARAMETERS = { suhu: '', kedalaman: '', kecerahan: '', ph: '' };
 const createInitialStationData = () => ({
@@ -126,17 +128,102 @@ const getToday = () => {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 };
 
+const serializeDate = (date) => {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    day: date.getDate(),
+  };
+};
+
+const deserializeDate = (value) => {
+  if (!value || typeof value !== 'object') {
+    return getToday();
+  }
+  const { year, month, day } = value;
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+    return getToday();
+  }
+  const parsed = new Date(year, month, day);
+  return Number.isNaN(parsed.getTime()) ? getToday() : parsed;
+};
+
+const loadPersistedDraft = () => {
+  const fallback = {
+    selectedPoint: 1,
+    selectedDate: getToday(),
+    observationsByPoint: createInitialObservations(),
+  };
+
+  try {
+    const raw = Storage.getItemSync(OBSERVATION_DRAFT_STORAGE_KEY);
+    if (!raw) {
+      return fallback;
+    }
+
+    const parsed = JSON.parse(raw);
+    const selectedPoint = STATIONS.includes(parsed?.selectedPoint) ? parsed.selectedPoint : 1;
+    const selectedDate = deserializeDate(parsed?.selectedDate);
+    const observationsByPoint = Object.fromEntries(
+      STATIONS.map((point) => {
+        const savedStation = parsed?.observationsByPoint?.[point];
+        const savedCounts = savedStation?.counts ?? {};
+        const savedParams = savedStation?.parameters ?? {};
+
+        return [
+          point,
+          {
+            counts: {
+              gastropoda: Math.max(0, Number(savedCounts.gastropoda) || 0),
+              odonata: Math.max(0, Number(savedCounts.odonata) || 0),
+            },
+            parameters: {
+              suhu: typeof savedParams.suhu === 'string' ? savedParams.suhu : '',
+              kedalaman: typeof savedParams.kedalaman === 'string' ? savedParams.kedalaman : '',
+              kecerahan: typeof savedParams.kecerahan === 'string' ? savedParams.kecerahan : '',
+              ph: typeof savedParams.ph === 'string' ? savedParams.ph : '',
+            },
+          },
+        ];
+      }),
+    );
+
+    return { selectedPoint, selectedDate, observationsByPoint };
+  } catch {
+    return fallback;
+  }
+};
+
 export default function InputObservationScreen({ onBack }) {
-  const [selectedPoint, setSelectedPoint] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(getToday);
+  const initialDraft = useMemo(() => loadPersistedDraft(), []);
+  const [selectedPoint, setSelectedPoint] = useState(initialDraft.selectedPoint);
+  const [selectedDate, setSelectedDate] = useState(initialDraft.selectedDate);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
-  const [observationsByPoint, setObservationsByPoint] = useState(createInitialObservations);
+  const [observationsByPoint, setObservationsByPoint] = useState(initialDraft.observationsByPoint);
   const [invalidFieldsByPoint, setInvalidFieldsByPoint] = useState({});
   const [feedbackModal, setFeedbackModal] = useState(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollViewRef = useRef(null);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    try {
+      Storage.setItemSync(
+        OBSERVATION_DRAFT_STORAGE_KEY,
+        JSON.stringify({
+          selectedPoint,
+          selectedDate: serializeDate(selectedDate),
+          observationsByPoint,
+        }),
+      );
+    } catch {
+      // Ignore storage write failures so input remains responsive.
+    }
+  }, [selectedPoint, selectedDate, observationsByPoint]);
 
   const currentStationData = selectedPoint ? observationsByPoint[selectedPoint] : null;
   const counts = currentStationData?.counts ?? INITIAL_COUNTS;
