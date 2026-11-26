@@ -218,8 +218,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontWeight: '400',
     fontSize: 12.5,
-    lineHeight: 12.5,
+    lineHeight: 18,
     letterSpacing: 0,
-    paddingVertical: 2,
+    includeFontPadding: false,
   },
 });
