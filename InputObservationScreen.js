@@ -96,6 +96,9 @@ const parseNumericInput = (raw, { allowNegative = false, maxDecimals = 2 } = {})
   return Number.isFinite(numeric) ? numeric : null;
 };
 
+const CUSTOM_ORGANISM_IMAGE = require('./assets/images/odonata-silhouette.png');
+const CUSTOM_ORGANISM_IMAGE_STYLE = { width: 44, height: 44 };
+
 const defaultBioindicators = [
   {
     key: 'gastropoda',
@@ -476,16 +479,14 @@ export default function InputObservationScreen({ onBack }) {
             <View style={styles.bioindicatorList}>
               {allBioindicators.map(({ key, name, source, imageStyle, accessibilityLabel }) => (
                 <View key={key} style={styles.bioindicatorItem}>
-                  {source ? (
-                    <View style={styles.bioindicatorImageBox}>
-                      <Image
-                        source={source}
-                        style={imageStyle}
-                        resizeMode="contain"
-                        accessibilityLabel={accessibilityLabel}
-                      />
-                    </View>
-                  ) : null}
+                  <View style={styles.bioindicatorImageBox}>
+                    <Image
+                      source={source ?? CUSTOM_ORGANISM_IMAGE}
+                      style={imageStyle ?? CUSTOM_ORGANISM_IMAGE_STYLE}
+                      resizeMode="contain"
+                      accessibilityLabel={accessibilityLabel ?? `Bioindikator ${name}`}
+                    />
+                  </View>
                   <View style={styles.bioindicatorInfo}>
                     <Text style={styles.bioindicatorName}>{name}</Text>
                   </View>
