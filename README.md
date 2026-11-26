@@ -99,6 +99,12 @@ Phone layouts below 600 logical pixels retain their existing spacing and content
 
 The calendar's day cells shrink on compact phones. Education preserves the selected slide when its available width changes. The app remains portrait-oriented as configured in `app.json`.
 
+### Device screenshot gallery
+
+Open [`screenshots/device-matrix/index.html`](screenshots/device-matrix/index.html) for live Android viewport captures of all five main screens across eight phone and tablet sizes. Each image links to its original resolution; `manifest.json` records dimensions, density, font scale, capture time, and visible text.
+
+To regenerate with the app already running in an attached Android emulator, run `python screenshots/device-matrix/capture.py`. The script changes display size/density temporarily and restores the previous configuration in a `finally` block. It navigates without creating or deleting observations. Captures show the top viewport of each screen, not a stitched full-page view, and may include Expo Go's developer overlay.
+
 ## Education Image Credits
 
 Bioindicator photographs used in the education carousel:

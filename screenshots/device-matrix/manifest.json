@@ -1,0 +1,1108 @@
+{
+  "capturedAt": "2026-11-26T13:28:59.214136+00:00",
+  "platform": "Android emulator / Expo Go",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "notes": "Live viewport captures at scroll top. No observations were created or deleted. Analysis reflects existing data. Expo Go developer overlay may be visible. Logical dimensions describe the whole display, including system bars.",
+  "profiles": [
+    {
+      "id": "compact-phone",
+      "label": "Compact phone",
+      "physical": [
+        640,
+        1136
+      ],
+      "density": 320,
+      "logical": [
+        320.0,
+        568.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/compact-phone/home.png",
+          "visibleText": [
+            "Tools",
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/compact-phone/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/compact-phone/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/compact-phone/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/compact-phone/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "small-phone",
+      "label": "Small phone",
+      "physical": [
+        720,
+        1280
+      ],
+      "density": 320,
+      "logical": [
+        360.0,
+        640.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/small-phone/home.png",
+          "visibleText": [
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/small-phone/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/small-phone/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "Sedang",
+            "Toleran",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/small-phone/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/small-phone/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "standard-phone",
+      "label": "Standard phone",
+      "physical": [
+        1179,
+        2556
+      ],
+      "density": 480,
+      "logical": [
+        393.0,
+        852.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/standard-phone/home.png",
+          "visibleText": [
+            "Tools",
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/standard-phone/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Tambah Organisme",
+            "Parameter Fisik & Kimia",
+            "Suhu (°C)",
+            "Kedalaman (cm)",
+            "Kecerahan (cm)",
+            "pH",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/standard-phone/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "Sedang",
+            "cukup baik",
+            "Toleran",
+            "air tercemar",
+            "1 dari 7",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/standard-phone/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Komunitas",
+            "Sahabat Sungai Malang",
+            "Fokus Pantauan",
+            "Makroinvertebrata & Kualitas Air",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/standard-phone/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "original-emulator",
+      "label": "Original emulator",
+      "physical": [
+        1280,
+        2856
+      ],
+      "density": 480,
+      "logical": [
+        426.67,
+        952.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/original-emulator/home.png",
+          "visibleText": [
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/original-emulator/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Tambah Organisme",
+            "Parameter Fisik & Kimia",
+            "Suhu (°C)",
+            "Kedalaman (cm)",
+            "Kecerahan (cm)",
+            "pH",
+            "Simpan Data",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/original-emulator/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "Sedang",
+            "cukup baik",
+            "Toleran",
+            "air tercemar",
+            "1 dari 7",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/original-emulator/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Komunitas",
+            "Sahabat Sungai Malang",
+            "Fokus Pantauan",
+            "Makroinvertebrata & Kualitas Air",
+            "Data Pengamatan",
+            "Belum ada catatan pengamatan sungai yang tersimpan di penyimpanan lokal.",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/original-emulator/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "large-phone",
+      "label": "Large phone",
+      "physical": [
+        1440,
+        3120
+      ],
+      "density": 480,
+      "logical": [
+        480.0,
+        1040.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/large-phone/home.png",
+          "visibleText": [
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/large-phone/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Tambah Organisme",
+            "Parameter Fisik & Kimia",
+            "Suhu (°C)",
+            "Kedalaman (cm)",
+            "Kecerahan (cm)",
+            "pH",
+            "Simpan Data",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/large-phone/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "Sedang",
+            "cukup baik",
+            "Toleran",
+            "air tercemar",
+            "Nimfa lalat sehari membutuhkan air sejuk dengan oksigen terlarut yang cukup. Banyak ditemukan pada sungai yang relatif bersih.",
+            "TINGKAT TOLERANSI",
+            "1 dari 7",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/large-phone/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Komunitas",
+            "Sahabat Sungai Malang",
+            "Fokus Pantauan",
+            "Makroinvertebrata & Kualitas Air",
+            "Data Pengamatan",
+            "Belum ada catatan pengamatan sungai yang tersimpan di penyimpanan lokal.",
+            "Hapus Semua Data Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/large-phone/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "small-tablet",
+      "label": "Small tablet",
+      "physical": [
+        1200,
+        1920
+      ],
+      "density": 320,
+      "logical": [
+        600.0,
+        960.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/small-tablet/home.png",
+          "visibleText": [
+            "Tools",
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/small-tablet/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Tambah Organisme",
+            "Parameter Fisik & Kimia",
+            "Suhu (°C)",
+            "Kedalaman (cm)",
+            "Kecerahan (cm)",
+            "pH",
+            "Simpan Data",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/small-tablet/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "Sedang",
+            "cukup baik",
+            "Toleran",
+            "air tercemar",
+            "1 dari 7",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/small-tablet/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Komunitas",
+            "Sahabat Sungai Malang",
+            "Fokus Pantauan",
+            "Makroinvertebrata & Kualitas Air",
+            "Data Pengamatan",
+            "Belum ada catatan pengamatan sungai yang tersimpan di penyimpanan lokal.",
+            "Hapus Semua Data Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/small-tablet/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tablet",
+      "label": "Tablet",
+      "physical": [
+        1600,
+        2560
+      ],
+      "density": 320,
+      "logical": [
+        800.0,
+        1280.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/tablet/home.png",
+          "visibleText": [
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/tablet/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Tambah Organisme",
+            "Parameter Fisik & Kimia",
+            "Suhu (°C)",
+            "Kedalaman (cm)",
+            "Kecerahan (cm)",
+            "pH",
+            "Simpan Data",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/tablet/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "Sedang",
+            "cukup baik",
+            "Toleran",
+            "air tercemar",
+            "Nimfa lalat sehari membutuhkan air sejuk dengan oksigen terlarut yang cukup. Banyak ditemukan pada sungai yang relatif bersih.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "1 dari 7",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/tablet/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Komunitas",
+            "Sahabat Sungai Malang",
+            "Fokus Pantauan",
+            "Makroinvertebrata & Kualitas Air",
+            "Data Pengamatan",
+            "Belum ada catatan pengamatan sungai yang tersimpan di penyimpanan lokal.",
+            "Hapus Semua Data Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/tablet/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "large-tablet",
+      "label": "Large tablet",
+      "physical": [
+        2048,
+        2732
+      ],
+      "density": 320,
+      "logical": [
+        1024.0,
+        1366.0
+      ],
+      "screens": [
+        {
+          "id": "home",
+          "title": "Beranda",
+          "path": "devices/large-tablet/home.png",
+          "visibleText": [
+            "Sahabat\nSungai",
+            "Halo, Penjelajah Sungai!",
+            "Ayo kita jaga kualitas sungai-sungai di lingkungan kita!",
+            "Sungai Temboro Cemorokandang",
+            "Malang, Jawa Timur",
+            "Monitoring Terakhir",
+            "Belum ada data",
+            "Input Pengamatan",
+            "Lihat Analisis",
+            "Belajar Bioindikator",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "input",
+          "title": "Pantau",
+          "path": "devices/large-tablet/input.png",
+          "visibleText": [
+            "Input Pengamatan",
+            "Titik Pengamatan",
+            "Titik 1",
+            "Titik 2",
+            "Titik 3",
+            "Nama Sungai",
+            "Sungai Temboro Cemorokandang",
+            "Tanggal Pengamatan",
+            "26 November 2026",
+            "Makroinvertebrata",
+            "Gastropoda",
+            "0",
+            "Odonata",
+            "0",
+            "Tambah Organisme",
+            "Parameter Fisik & Kimia",
+            "Suhu (°C)",
+            "Kedalaman (cm)",
+            "Kecerahan (cm)",
+            "pH",
+            "Simpan Data",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "education",
+          "title": "Edukasi",
+          "path": "devices/large-tablet/education.png",
+          "visibleText": [
+            "Kenali Bioindikator",
+            "Geser untuk belajar",
+            "Odonata",
+            "Nimfa capung",
+            "Predator perairan",
+            "Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "Sedang",
+            "cukup baik",
+            "Toleran",
+            "air tercemar",
+            "Lalat Sehari",
+            "Nimfa Ephemeroptera",
+            "Nimfa lalat sehari membutuhkan air sejuk dengan oksigen terlarut yang cukup. Banyak ditemukan pada sungai yang relatif bersih.",
+            "TINGKAT TOLERANSI",
+            "Peka",
+            "air bersih",
+            "1 dari 7",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "profile",
+          "title": "Profil",
+          "path": "devices/large-tablet/profile.png",
+          "visibleText": [
+            "Profil",
+            "PS",
+            "Penjelajah Sungai",
+            "Pecinta Sungai • Sahabat Sungai",
+            "Peduli kebersihan aliran sungai dan kelestarian bioindikator makroinvertebrata di lingkungan sekitar.",
+            "Relawan Aktif",
+            "Status",
+            "Malang",
+            "Domisili",
+            "2026",
+            "Bergabung",
+            "Identitas Relawan",
+            "Peran",
+            "Pecinta & Pemantau Sungai",
+            "Wilayah Fokus",
+            "DAS Brantas, Malang Raya",
+            "Komunitas",
+            "Sahabat Sungai Malang",
+            "Fokus Pantauan",
+            "Makroinvertebrata & Kualitas Air",
+            "Data Pengamatan",
+            "Belum ada catatan pengamatan sungai yang tersimpan di penyimpanan lokal.",
+            "Hapus Semua Data Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        },
+        {
+          "id": "analysis",
+          "title": "Analisis Sungai",
+          "path": "devices/large-tablet/analysis.png",
+          "visibleText": [
+            "Analisis Sungai",
+            "Belum Ada Data Analisis",
+            "Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.",
+            "Input Pengamatan",
+            "Beranda",
+            "Pantau",
+            "Edukasi",
+            "Profil"
+          ]
+        }
+      ]
+    }
+  ]
+}
