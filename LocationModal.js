@@ -15,7 +15,7 @@ export default function LocationModal({ visible, onClose, onSelect }) {
   const cardHeight = Math.min(560, Math.round(height * 0.72));
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <Pressable accessibilityRole="button" accessibilityLabel="Tutup pemilih lokasi" onPress={onClose} style={styles.overlay}>
         <Pressable onPress={(event) => event.stopPropagation()} style={[styles.card, { height: cardHeight }]}>
           <Pressable
