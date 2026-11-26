@@ -19,6 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DatePickerModal, { formatIndonesianDate } from './DatePickerModal';
 import LocationModal, { riverLocations } from './LocationModal';
+import { saveObservation } from './observationStorage';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 import BugIcon from './assets/icons/bug.svg';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
@@ -355,6 +356,7 @@ export default function InputObservationScreen({ onBack }) {
   const handleSave = () => {
     const missingFields = [];
     const nextInvalidFieldsByPoint = {};
+    const parsedStations = [];
 
     if (!selectedLocation) {
       missingFields.push('Nama Sungai');
@@ -364,18 +366,34 @@ export default function InputObservationScreen({ onBack }) {
     }
 
     for (const point of STATIONS) {
-      const stationParams = observationsByPoint[point]?.parameters ?? INITIAL_PARAMETERS;
+      const stationData = observationsByPoint[point];
+      const stationParams = stationData?.parameters ?? INITIAL_PARAMETERS;
+      const stationCounts = stationData?.counts ?? INITIAL_COUNTS;
       const pointInvalidFields = {};
+      const parsedParams = {};
 
       for (const { key, label, allowNegative } of parameterRows.flat()) {
-        if (parseNumericInput(stationParams[key], { allowNegative }) === null) {
+        const numeric = parseNumericInput(stationParams[key], { allowNegative });
+        if (numeric === null) {
           missingFields.push(`Titik ${point}: ${label}`);
           pointInvalidFields[key] = true;
+        } else {
+          parsedParams[key] = numeric;
         }
       }
 
       if (Object.keys(pointInvalidFields).length > 0) {
         nextInvalidFieldsByPoint[point] = pointInvalidFields;
+      } else {
+        parsedStations.push({
+          point,
+          ...parsedParams,
+          organisms: allBioindicators.map(({ key, name }) => ({
+            key,
+            name,
+            count: Math.max(0, Number(stationCounts[key]) || 0),
+          })),
+        });
       }
     }
 
@@ -385,6 +403,21 @@ export default function InputObservationScreen({ onBack }) {
         type: 'error',
         title: 'Data Belum Lengkap',
         message: `Harap lengkapi semua kolom dengan benar:\n• ${missingFields.join('\n• ')}`,
+      });
+      return;
+    }
+
+    try {
+      saveObservation({
+        location: selectedLocation,
+        date: selectedDate,
+        stations: parsedStations,
+      });
+    } catch {
+      setFeedbackModal({
+        type: 'error',
+        title: 'Gagal Menyimpan',
+        message: 'Terjadi kesalahan saat menyimpan data pengamatan ke penyimpanan lokal.',
       });
       return;
     }
