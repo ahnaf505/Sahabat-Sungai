@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { BlurTargetView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BarChartIcon from './assets/icons/bar-chart.svg';
@@ -265,7 +264,6 @@ const otherScreens = [
 
 export default function App() {
   const [notificationsVisible, setNotificationsVisible] = useState(false);
-  const blurTargetRef = useRef(null);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const screens = [
@@ -275,42 +273,39 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <BlurTargetView ref={blurTargetRef} style={styles.homeScreen}>
-        <LinearGradient
+      <LinearGradient
+        pointerEvents="none"
+        colors={['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA']}
+        locations={[0, 0.24, 0.48, 0.7]}
+        style={styles.lowerBackgroundGradient}
+      />
+      {cornerBushes.map(({ key, source, style, bottomOffset, label }) => (
+        <Image
+          key={key}
           pointerEvents="none"
-          colors={['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA']}
-          locations={[0, 0.24, 0.48, 0.7]}
-          style={styles.lowerBackgroundGradient}
+          source={source}
+          style={[
+            styles.cornerBush,
+            style,
+            { bottom: Math.max(insets.bottom, 16) + bottomOffset + 18 },
+          ]}
+          resizeMode="contain"
+          accessibilityLabel={label}
         />
-        {cornerBushes.map(({ key, source, style, bottomOffset, label }) => (
-          <Image
-            key={key}
-            pointerEvents="none"
-            source={source}
-            style={[
-              styles.cornerBush,
-              style,
-              { bottom: Math.max(insets.bottom, 16) + bottomOffset + 18 },
-            ]}
-            resizeMode="contain"
-            accessibilityLabel={label}
-          />
-        ))}
+      ))}
 
-        <View style={styles.pageViewport}>
-          <View style={[styles.pageTrack, { width: width * tabs.length }]}>
-            {screens.map((screen, index) => (
-              <View key={tabs[index].key} style={[styles.page, { width }]}>
-                {screen}
-              </View>
-            ))}
-          </View>
+      <View style={styles.pageViewport}>
+        <View style={[styles.pageTrack, { width: width * tabs.length }]}>
+          {screens.map((screen, index) => (
+            <View key={tabs[index].key} style={[styles.page, { width }]}>
+              {screen}
+            </View>
+          ))}
         </View>
-      </BlurTargetView>
+      </View>
 
       <NotificationModal
         visible={notificationsVisible}
-        blurTarget={blurTargetRef}
         onClose={() => setNotificationsVisible(false)}
       />
       <StatusBar style="auto" />
