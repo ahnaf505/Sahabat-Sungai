@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DatePickerModal, { formatIndonesianDate } from './DatePickerModal';
+import LocationModal, { riverLocations } from './LocationModal';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 import BugIcon from './assets/icons/bug.svg';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
@@ -157,6 +158,7 @@ const deserializeDate = (value) => {
 const loadPersistedDraft = () => {
   const fallback = {
     selectedPoint: 1,
+    selectedLocation: riverLocations[0],
     selectedDate: getToday(),
     customOrganisms: [],
     observationsByPoint: createInitialObservations(),
@@ -170,6 +172,9 @@ const loadPersistedDraft = () => {
 
     const parsed = JSON.parse(raw);
     const selectedPoint = STATIONS.includes(parsed?.selectedPoint) ? parsed.selectedPoint : 1;
+    const savedLocationName = parsed?.selectedLocation?.name;
+    const selectedLocation =
+      riverLocations.find((loc) => loc.name === savedLocationName) ?? riverLocations[0];
     const selectedDate = deserializeDate(parsed?.selectedDate);
     const customOrganisms = Array.isArray(parsed?.customOrganisms)
       ? parsed.customOrganisms.filter(
@@ -209,7 +214,7 @@ const loadPersistedDraft = () => {
       }),
     );
 
-    return { selectedPoint, selectedDate, customOrganisms, observationsByPoint };
+    return { selectedPoint, selectedLocation, selectedDate, customOrganisms, observationsByPoint };
   } catch {
     return fallback;
   }
@@ -218,6 +223,8 @@ const loadPersistedDraft = () => {
 export default function InputObservationScreen({ onBack }) {
   const initialDraft = useMemo(() => loadPersistedDraft(), []);
   const [selectedPoint, setSelectedPoint] = useState(initialDraft.selectedPoint);
+  const [selectedLocation, setSelectedLocation] = useState(initialDraft.selectedLocation);
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(initialDraft.selectedDate);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [customOrganisms, setCustomOrganisms] = useState(initialDraft.customOrganisms);
@@ -238,6 +245,7 @@ export default function InputObservationScreen({ onBack }) {
         OBSERVATION_DRAFT_STORAGE_KEY,
         JSON.stringify({
           selectedPoint,
+          selectedLocation: selectedLocation ? { name: selectedLocation.name } : null,
           selectedDate: serializeDate(selectedDate),
           customOrganisms,
           observationsByPoint,
@@ -246,7 +254,7 @@ export default function InputObservationScreen({ onBack }) {
     } catch {
       // Ignore storage write failures so input remains responsive.
     }
-  }, [selectedPoint, selectedDate, customOrganisms, observationsByPoint]);
+  }, [selectedPoint, selectedLocation, selectedDate, customOrganisms, observationsByPoint]);
 
   const currentStationData = selectedPoint ? observationsByPoint[selectedPoint] : null;
   const counts = currentStationData?.counts ?? INITIAL_COUNTS;
@@ -348,6 +356,9 @@ export default function InputObservationScreen({ onBack }) {
     const missingFields = [];
     const nextInvalidFieldsByPoint = {};
 
+    if (!selectedLocation) {
+      missingFields.push('Nama Sungai');
+    }
     if (!selectedDate) {
       missingFields.push('Tanggal Pengamatan');
     }
@@ -379,6 +390,7 @@ export default function InputObservationScreen({ onBack }) {
     }
 
     setSelectedPoint(1);
+    setSelectedLocation(riverLocations[0]);
     setSelectedDate(getToday());
     setCustomOrganisms([]);
     setObservationsByPoint(createInitialObservations());
@@ -466,6 +478,24 @@ export default function InputObservationScreen({ onBack }) {
                 );
               })}
             </View>
+            <View style={styles.dateHeader}>
+              <MapPointIcon width={28} height={28} accessibilityLabel="Nama sungai" />
+              <Text style={styles.dateHeaderTitle}>Nama Sungai</Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Pilih nama sungai"
+              onPress={() => setLocationModalVisible(true)}
+              style={styles.dateInputBox}
+            >
+              <Text
+                style={[styles.dateInputText, !selectedLocation && styles.dateInputPlaceholder]}
+                numberOfLines={1}
+              >
+                {selectedLocation ? selectedLocation.name : 'Pilih nama sungai'}
+              </Text>
+              <ChevronDownIcon width={18} height={10} color="#000000" style={styles.dateInputChevron} />
+            </Pressable>
             <View style={styles.dateHeader}>
               <CalendarWeekIcon width={28} height={28} accessibilityLabel="Tanggal pengamatan" />
               <Text style={styles.dateHeaderTitle}>Tanggal Pengamatan</Text>
@@ -618,6 +648,15 @@ export default function InputObservationScreen({ onBack }) {
           </View>
         </View>
       </ScrollView>
+
+      <LocationModal
+        visible={locationModalVisible}
+        onClose={() => setLocationModalVisible(false)}
+        onSelect={(location) => {
+          setSelectedLocation(location);
+          setLocationModalVisible(false);
+        }}
+      />
 
       <DatePickerModal
         visible={datePickerVisible}
