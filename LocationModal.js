@@ -18,17 +18,17 @@ export default function LocationModal({ visible, onClose, onSelect }) {
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <View style={styles.overlay}>
         <Pressable style={styles.scrim} onPress={onClose} />
-        <View style={[styles.card, { maxHeight: cardHeight }]}>
+        <View style={[styles.card, { height: cardHeight }]}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Kembali"
             onPress={onClose}
             style={styles.backButton}
           >
-            <ArrowLeftIcon width={25} height={25} color="#000000" />
+            <ArrowLeftIcon width={25} height={25} color="#FFFFFF" />
           </Pressable>
           <Text style={styles.title}>Pilih Lokasi Sungai</Text>
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.locationList}>
+          <ScrollView style={styles.locationScrollView} showsVerticalScrollIndicator contentContainerStyle={styles.locationList}>
             {riverLocations.map((location) => (
               <Pressable
                 key={location.name}
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     maxWidth: 460,
     padding: 20,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
     boxShadow: '0px 4px 4px 0px #00000040',
   },
   backButton: {
@@ -76,17 +76,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 27.5,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(0, 0, 0, 0.32)',
     borderWidth: 1,
-    borderColor: '#0000000D',
+    borderColor: 'rgba(255, 255, 255, 0.25)',
   },
   title: {
     marginTop: 18,
-    color: '#000000',
+    color: '#FFFFFF',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 22,
     lineHeight: 27,
     fontWeight: '700',
+  },
+  locationScrollView: {
+    flex: 1,
   },
   locationList: {
     paddingTop: 12,
@@ -97,14 +100,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
   },
   locationTextGroup: {
     flex: 1,
     marginLeft: 14,
   },
   locationName: {
-    color: '#000000',
+    color: '#FFFFFF',
     fontFamily: 'AvantGarde-Demi',
     fontSize: 16,
     lineHeight: 20,
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
   },
   locationRegion: {
     marginTop: 3,
-    color: '#000000',
+    color: '#FFFFFF',
     fontFamily: 'AvantGarde Tx',
     fontSize: 14,
     lineHeight: 18,
