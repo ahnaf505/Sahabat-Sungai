@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
+import LocationModal, { riverLocations } from '../LocationModal';
 import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
 import BarChartIcon from '../assets/icons/bar-chart.svg';
+import ChevronRightIcon from '../assets/icons/chevron-right.svg';
+import MapPointIcon from '../assets/icons/map-point.svg';
 import WarningBadgeIcon from '../assets/icons/warning-badge.svg';
 import WaterDropIcon from '../assets/icons/water-drop.svg';
 import DiversityLeafIcon from '../assets/icons/diversity-leaf.svg';
@@ -157,6 +161,8 @@ function DonutChart({ data, size = 126, thickness = 26, gapDegrees = 2 }) {
 export default function AnalisisScreen({ analysisData = null }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const [locationsVisible, setLocationsVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(riverLocations[0]);
   const isCompact = width < 380;
   const waterDropSize = isCompact ? 86 : 104;
   const warningBadgeSize = isCompact ? 31 : 37;
@@ -195,6 +201,20 @@ export default function AnalisisScreen({ analysisData = null }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingTop: 0, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
       >
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Pilih sungai yang dianalisis: ${selectedLocation.name}, ${selectedLocation.region}`}
+          onPress={() => setLocationsVisible(true)}
+          style={styles.riverCard}
+        >
+          <MapPointIcon width={34} height={34} accessibilityLabel="Lokasi sungai" />
+          <View style={styles.riverTextGroup}>
+            <Text style={styles.riverEyebrow}>Sungai Dianalisis</Text>
+            <Text style={styles.riverName} numberOfLines={1}>{selectedLocation.name}</Text>
+            <Text style={styles.riverRegion} numberOfLines={1}>{selectedLocation.region}</Text>
+          </View>
+          <ChevronRightIcon width={11} height={19} color="#000000" />
+        </Pressable>
         {!analysisData ? (
           <View style={[styles.emptyCard, { padding: cardPadding }]}>
             <View style={styles.emptyIconBadge}>
@@ -270,6 +290,14 @@ export default function AnalisisScreen({ analysisData = null }) {
           </>
         )}
       </ScrollView>
+      <LocationModal
+        visible={locationsVisible}
+        onClose={() => setLocationsVisible(false)}
+        onSelect={(location) => {
+          setSelectedLocation(location);
+          setLocationsVisible(false);
+        }}
+      />
     </View>
   );
 }
@@ -284,6 +312,11 @@ const styles = StyleSheet.create({
   backButton: { position: 'absolute', left: 0, width: 55, height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 27.5, backgroundColor: '#FFFFFF' },
   rightIcon: { position: 'absolute', right: 0 },
   title: { paddingHorizontal: 64, color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 20, lineHeight: 20, letterSpacing: 0, paddingVertical: 2, textAlign: 'center' },
+  riverCard: { width: '100%', marginTop: 2, marginBottom: 14, paddingHorizontal: 18, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFFFFF', boxShadow: '0px 0px 3px 0px #0000001F', elevation: 2 },
+  riverTextGroup: { flex: 1, marginLeft: 12, marginRight: 12 },
+  riverEyebrow: { color: '#005E36', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 11.5, lineHeight: 15 },
+  riverName: { marginTop: 2, color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 15.5, lineHeight: 20 },
+  riverRegion: { color: '#4B5563', fontFamily: 'Poppins-Regular', fontWeight: '400', fontSize: 13, lineHeight: 17 },
   summaryCard: { width: '100%', minHeight: 160, marginTop: 2, paddingHorizontal: 16, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderRadius: 25, backgroundColor: '#FBEBD5' },
   waterMarkBox: { width: 104, height: 104, position: 'relative' },
   warningBadge: { position: 'absolute', left: 6, bottom: 4 },
