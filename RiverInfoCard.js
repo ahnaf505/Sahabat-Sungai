@@ -1,20 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
 import ChevronRightIcon from './assets/icons/chevron-right.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 
 /** Displays the river location and last monitoring date card. */
-export default function RiverInfoCard({ style }) {
+export default function RiverInfoCard({ location, onPress, style }) {
   return (
     <View style={[styles.card, style]}>
-      <View style={styles.row}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Pilih lokasi sungai" onPress={onPress} style={styles.locationButton}>
         <MapPointIcon width={38} height={38} accessibilityLabel="Lokasi sungai" />
         <View style={styles.locationTextGroup}>
-          <Text style={styles.locationName}>Sungai Temboro Cemorokandang</Text>
-          <Text style={styles.locationRegion}>Malang, Jawa Timur</Text>
+          <Text style={styles.locationName}>{location.name}</Text>
+          <Text style={styles.locationRegion}>{location.region}</Text>
         </View>
         <ChevronRightIcon width={11} height={19} color="#000000" />
-      </View>
+      </Pressable>
 
       <View style={styles.cardDivider} />
 
@@ -44,6 +44,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 4,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   row: {
     flexDirection: 'row',

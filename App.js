@@ -12,6 +12,7 @@ import MapPointIcon from './assets/icons/map-point.svg';
 import NotificationIcon from './assets/icons/notification.svg';
 import { styles } from './App.styles';
 import NotificationModal from './NotificationModal';
+import LocationModal, { riverLocations } from './LocationModal';
 import RiverInfoCard from './RiverInfoCard';
 
 const tabs = [
@@ -83,7 +84,7 @@ function useResponsiveMetrics() {
   return { insets, width, height, horizontalPadding, bottomNavClearance };
 }
 
-function HomeScreen({ onOpenNotifications }) {
+function HomeScreen({ location, onOpenLocations, onOpenNotifications }) {
   const { insets, width, height, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
   const isCompactHeight = height < 720;
   const heroGap = isCompactHeight ? 10 : Math.min(24, Math.round(height * 0.025));
@@ -134,7 +135,7 @@ function HomeScreen({ onOpenNotifications }) {
       </View>
 
       <View style={[styles.homeActionsStack, { marginTop: cardTopMargin, gap: stackGap }]}>
-        <RiverInfoCard />
+        <RiverInfoCard location={location} onPress={onOpenLocations} />
         <View style={styles.homeButtonsGroup}>
           {homeActions.map(({ key, label, path, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
             <Pressable
@@ -264,10 +265,17 @@ const otherScreens = [
 
 export default function App() {
   const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const [locationsVisible, setLocationsVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(riverLocations[0]);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const screens = [
-    <HomeScreen key="beranda" onOpenNotifications={() => setNotificationsVisible(true)} />,
+    <HomeScreen
+      key="beranda"
+      location={selectedLocation}
+      onOpenLocations={() => setLocationsVisible(true)}
+      onOpenNotifications={() => setNotificationsVisible(true)}
+    />,
     ...otherScreens,
   ];
 
@@ -307,6 +315,14 @@ export default function App() {
       <NotificationModal
         visible={notificationsVisible}
         onClose={() => setNotificationsVisible(false)}
+      />
+      <LocationModal
+        visible={locationsVisible}
+        onClose={() => setLocationsVisible(false)}
+        onSelect={(location) => {
+          setSelectedLocation(location);
+          setLocationsVisible(false);
+        }}
       />
       <StatusBar style="auto" />
     </View>
