@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { formatIndonesianDate } from '../DatePickerModal';
+import { formatIsoDateLabel } from '../DatePickerModal';
 import LocationModal from '../LocationModal';
 import { getLatestObservationByRiver, getSavedAnalysisRivers } from '../observationStorage';
 import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
@@ -73,18 +73,6 @@ const formatIndonesianNumber = (value, maxDecimals = 2, minDecimals = 0) => {
     decPart = decPart.slice(0, -1);
   }
   return decPart.length > 0 ? `${intPart},${decPart}` : intPart;
-};
-
-const formatIsoDateLabel = (isoDate) => {
-  if (typeof isoDate !== 'string') {
-    return '';
-  }
-  const parts = isoDate.split('-').map(Number);
-  if (parts.length !== 3 || parts.some((n) => !Number.isInteger(n))) {
-    return isoDate;
-  }
-  const [year, month, day] = parts;
-  return formatIndonesianDate(new Date(year, month - 1, day));
 };
 
 const hslToHex = (hue, saturation, lightness) => {

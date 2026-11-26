@@ -23,6 +23,23 @@ export function formatIndonesianDate(date) {
   return `${date.getDate()} ${MONTHS_ID[date.getMonth()]} ${date.getFullYear()}`;
 }
 
+/** Formats an ISO YYYY-MM-DD date string in Indonesian, e.g. "26 November 2026". */
+export function formatIsoDateLabel(isoDate) {
+  if (typeof isoDate !== 'string') {
+    return '';
+  }
+  const parts = isoDate.split('-').map(Number);
+  if (parts.length !== 3 || parts.some((n) => !Number.isInteger(n))) {
+    return isoDate;
+  }
+  const [year, month, day] = parts;
+  const parsed = new Date(year, month - 1, day);
+  if (Number.isNaN(parsed.getTime())) {
+    return isoDate;
+  }
+  return formatIndonesianDate(parsed);
+}
+
 function isSameDay(a, b) {
   return Boolean(
     a &&

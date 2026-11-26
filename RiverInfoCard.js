@@ -4,7 +4,7 @@ import ChevronRightIcon from './assets/icons/chevron-right.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 
 /** Displays the river location and last monitoring date card. */
-export default function RiverInfoCard({ location, onPress, style }) {
+export default function RiverInfoCard({ location, lastMonitoringDate = '', onPress, style }) {
   return (
     <View style={[styles.card, style]}>
       <Pressable accessibilityRole="button" accessibilityLabel="Pilih lokasi sungai" onPress={onPress} style={styles.locationButton}>
@@ -22,7 +22,13 @@ export default function RiverInfoCard({ location, onPress, style }) {
         <CalendarWeekIcon width={28} height={28} accessibilityLabel="Monitoring terakhir" />
         <View style={styles.monitoringTextGroup}>
           <Text style={styles.monitoringLabel}>Monitoring Terakhir</Text>
-          <Text style={styles.monitoringDate}>14 Oktober 2026</Text>
+          <Text
+            style={[styles.monitoringDate, !lastMonitoringDate && styles.monitoringDateEmpty]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            {lastMonitoringDate || 'Belum ada data'}
+          </Text>
         </View>
       </View>
     </View>
@@ -100,5 +106,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
     fontWeight: '700',
     paddingVertical: 4,
+  },
+  monitoringDateEmpty: {
+    color: '#6B7280',
+    fontFamily: 'AvantGarde Tx',
+    fontWeight: '400',
   },
 });

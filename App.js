@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,9 +11,11 @@ import GraduationCapIcon from './assets/icons/graduation-cap.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 import NotificationIcon from './assets/icons/notification.svg';
 import { styles } from './App.styles';
+import { formatIsoDateLabel } from './DatePickerModal';
 import NotificationModal from './NotificationModal';
 import LocationModal, { riverLocations } from './LocationModal';
 import RiverInfoCard from './RiverInfoCard';
+import { getLatestObservation, getLatestObservationByRiver } from './observationStorage';
 
 const tabs = [
   { key: 'beranda' },
@@ -84,7 +86,7 @@ function useResponsiveMetrics() {
   return { insets, width, height, horizontalPadding, bottomNavClearance };
 }
 
-function HomeScreen({ location, onOpenLocations, onOpenNotifications }) {
+function HomeScreen({ location, lastMonitoringDate, onOpenLocations, onOpenNotifications }) {
   const { insets, width, height, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
   const isCompactHeight = height < 720;
   const heroGap = isCompactHeight ? 10 : Math.min(24, Math.round(height * 0.025));
@@ -135,7 +137,11 @@ function HomeScreen({ location, onOpenLocations, onOpenNotifications }) {
       </View>
 
       <View style={[styles.homeActionsStack, { marginTop: cardTopMargin, gap: stackGap }]}>
-        <RiverInfoCard location={location} onPress={onOpenLocations} />
+        <RiverInfoCard
+          location={location}
+          lastMonitoringDate={lastMonitoringDate}
+          onPress={onOpenLocations}
+        />
         <View style={styles.homeButtonsGroup}>
           {homeActions.map(({ key, label, path, Icon, iconWidth, iconHeight, iconColor, buttonStyle, labelStyle }) => (
             <Pressable
@@ -267,12 +273,51 @@ export default function App() {
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [locationsVisible, setLocationsVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(riverLocations[0]);
+  const [lastMonitoringDate, setLastMonitoringDate] = useState('');
+  const hasManualSelectionRef = useRef(false);
+  const selectedLocationRef = useRef(selectedLocation);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+
+  const refreshMonitoringDate = useCallback(() => {
+    try {
+      if (!hasManualSelectionRef.current) {
+        const latest = getLatestObservation();
+        if (latest) {
+          const matchedLocation =
+            riverLocations.find((loc) => loc.name === latest.river_name) ?? {
+              name: latest.river_name,
+              region: latest.river_region,
+              latitude: latest.latitude,
+              longitude: latest.longitude,
+            };
+          selectedLocationRef.current = matchedLocation;
+          setSelectedLocation(matchedLocation);
+          setLastMonitoringDate(formatIsoDateLabel(latest.observed_at));
+          return;
+        }
+      }
+
+      const latestForRiver = getLatestObservationByRiver(selectedLocationRef.current.name);
+      setLastMonitoringDate(
+        latestForRiver ? formatIsoDateLabel(latestForRiver.observed_at) : '',
+      );
+    } catch {
+      setLastMonitoringDate('');
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshMonitoringDate();
+    }, [refreshMonitoringDate]),
+  );
+
   const screens = [
     <HomeScreen
       key="beranda"
       location={selectedLocation}
+      lastMonitoringDate={lastMonitoringDate}
       onOpenLocations={() => setLocationsVisible(true)}
       onOpenNotifications={() => setNotificationsVisible(true)}
     />,
@@ -318,10 +363,21 @@ export default function App() {
       />
       <LocationModal
         visible={locationsVisible}
+        selectedLocation={selectedLocation}
         onClose={() => setLocationsVisible(false)}
         onSelect={(location) => {
+          hasManualSelectionRef.current = true;
+          selectedLocationRef.current = location;
           setSelectedLocation(location);
           setLocationsVisible(false);
+          try {
+            const latestForRiver = getLatestObservationByRiver(location.name);
+            setLastMonitoringDate(
+              latestForRiver ? formatIsoDateLabel(latestForRiver.observed_at) : '',
+            );
+          } catch {
+            setLastMonitoringDate('');
+          }
         }}
       />
       <StatusBar style="auto" />
