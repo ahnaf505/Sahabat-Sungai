@@ -83,6 +83,7 @@ export default function AnalisisScreen() {
             <Text style={styles.summaryCaption}>Berdasarkan skor bioindikator makroinvertebrata</Text>
           </View>
         </View>
+        <View style={styles.detailCard} />
       </ScrollView>
     </View>
   );
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     fontSize: 45,
     lineHeight: 45,
     letterSpacing: 0,
-    paddingVertical: 2,
+    includeFontPadding: false,
     flexShrink: 1,
   },
   statusBadge: {
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   summaryCaption: {
-    marginTop: 6,
+    marginTop: 2,
     color: '#000000',
     fontFamily: 'Poppins-Regular',
     fontWeight: '400',
@@ -221,5 +222,14 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     letterSpacing: 0,
     includeFontPadding: false,
+  },
+  detailCard: {
+    width: '100%',
+    height: 97,
+    marginTop: 16,
+    padding: 20,
+    borderRadius: 25,
+    backgroundColor: '#FFFFFF',
+    boxShadow: '0px 0px 5px 0px #00000040',
   },
 });
