@@ -27,6 +27,7 @@ const educationCards = [
     description:
       'Nimfa capung hidup di dasar sungai dan memangsa hewan kecil. Keberadaannya dapat membantu membaca kondisi habitat perairan.',
     tolerance: 'sedang',
+    imageType: 'cutout',
   },
   {
     key: 'mayfly',
@@ -38,6 +39,43 @@ const educationCards = [
     description:
       'Nimfa lalat sehari membutuhkan air sejuk dengan oksigen terlarut yang cukup. Banyak ditemukan pada sungai yang relatif bersih.',
     tolerance: 'peka',
+    imageType: 'cutout',
+  },
+  {
+    key: 'stonefly',
+    image: require('../assets/images/stonefly-nymph.png'),
+    imageLabel: 'Foto nimfa lalat batu',
+    title: 'Lalat Batu',
+    subtitle: 'Nimfa Plecoptera',
+    group: 'Kelompok EPT',
+    description:
+      'Nimfa lalat batu menyukai aliran dingin, berbatu, dan kaya oksigen. Kehadirannya kuat mengindikasikan air yang masih bersih.',
+    tolerance: 'peka',
+    imageType: 'photo',
+  },
+  {
+    key: 'caddisfly',
+    image: require('../assets/images/caddisfly-larva.jpg'),
+    imageLabel: 'Foto larva ngengat air di dalam selubung',
+    title: 'Ngengat Air',
+    subtitle: 'Larva Trichoptera',
+    group: 'Kelompok EPT',
+    description:
+      'Banyak larva ngengat air membuat selubung dari pasir atau ranting. Sebagian besar hidup baik pada air bersih dengan oksigen cukup.',
+    tolerance: 'peka',
+    imageType: 'photo',
+  },
+  {
+    key: 'diving-beetle',
+    image: require('../assets/images/diving-beetle-larva.jpg'),
+    imageLabel: 'Foto larva kumbang penyelam',
+    title: 'Kumbang Air',
+    subtitle: 'Larva Dytiscidae',
+    group: 'Predator perairan',
+    description:
+      'Larva kumbang air adalah predator aktif yang dapat hidup di beragam perairan. Temuannya menunjukkan kondisi sedang dan perlu dibaca bersama hewan lain.',
+    tolerance: 'sedang',
+    imageType: 'photo',
   },
   {
     key: 'snail',
@@ -49,6 +87,19 @@ const educationCards = [
     description:
       'Sebagian siput air mampu bertahan saat kadar oksigen rendah. Jumlah yang dominan dapat menjadi tanda kondisi air yang menurun.',
     tolerance: 'toleran',
+    imageType: 'cutout',
+  },
+  {
+    key: 'tubifex',
+    image: require('../assets/images/tubifex.png'),
+    imageLabel: 'Foto koloni cacing Tubifex',
+    title: 'Cacing Sutra',
+    subtitle: 'Tubifex sp.',
+    group: 'Cacing air',
+    description:
+      'Tubifex mampu hidup pada lumpur kaya bahan organik dan oksigen rendah. Koloni yang melimpah sering menandakan pencemaran organik.',
+    tolerance: 'toleran',
+    imageType: 'photo',
   },
 ];
 
@@ -167,8 +218,11 @@ export default function EdukasiScreen() {
                     <View style={styles.imageGlow} />
                     <Image
                       source={item.image}
-                      style={styles.bioindicatorImage}
-                      resizeMode="contain"
+                      style={[
+                        styles.bioindicatorImage,
+                        item.imageType === 'photo' && styles.bioindicatorPhoto,
+                      ]}
+                      resizeMode={item.imageType === 'photo' ? 'cover' : 'contain'}
                       accessibilityLabel={item.imageLabel}
                     />
                   </View>
@@ -337,6 +391,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+  },
+  bioindicatorPhoto: {
+    width: 230,
+    height: 150,
+    borderRadius: 22,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   title: {
     marginTop: 4,

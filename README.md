@@ -93,6 +93,15 @@ Tagging a semantic version on `main` (for example, `v0.1.0`) triggers [`.github/
 3. Generates the native Android project (`npx expo prebuild --platform android --no-install`).
 4. Builds a release APK (`./gradlew app:assembleRelease`), verifies `assets/index.android.bundle` is packaged inside, and publishes `Sahabat-Sungai-<tag>.apk` to GitHub Releases.
 
+## Education Image Credits
+
+Bioindicator photographs used in the education carousel:
+
+- Caddisfly larva — MyForest, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Caddisfly_Larva.jpg), CC BY-SA 3.0.
+- Stonefly nymph — Dave Huth, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stonefly_nymph_(5787610055).png), CC BY 2.0.
+- Diving beetle larva — Hulcr, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dytiscus_marginalis_larva.jpg), CC BY-SA 4.0.
+- Tubifex colony — Ministry of Marine Affairs and Fisheries of Indonesia, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cacing_Sutra_Tubifex.png), public domain under Indonesian government works terms.
+
 ## License
 
 Licensed under the [MIT License](./LICENSE).
