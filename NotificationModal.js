@@ -4,7 +4,7 @@ import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 /** Blank notification popup with translucent dark backdrop and top-left back button. */
 export default function NotificationModal({ visible, onClose }) {
   const { height } = useWindowDimensions();
-  const cardHeight = Math.min(420, Math.round(height * 0.55));
+  const cardHeight = Math.min(560, Math.round(height * 0.72));
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
