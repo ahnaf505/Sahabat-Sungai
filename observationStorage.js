@@ -25,6 +25,15 @@ const getDatabase = () => {
         created_at TEXT NOT NULL
       );
 
+      CREATE TABLE IF NOT EXISTS custom_rivers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL COLLATE NOCASE UNIQUE,
+        region TEXT NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        created_at TEXT NOT NULL
+      );
+
       CREATE TABLE IF NOT EXISTS observation_stations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         observation_id INTEGER NOT NULL,
@@ -66,6 +75,37 @@ const formatIsoDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+/** Saves a user-defined river and returns its normalized location record. */
+export function saveCustomRiver({ name, region, latitude, longitude }) {
+  const location = {
+    name: name.trim(),
+    region: region.trim(),
+    latitude: Number(latitude),
+    longitude: Number(longitude),
+  };
+  const db = getDatabase();
+  db.runSync(
+    `INSERT INTO custom_rivers (name, region, latitude, longitude, created_at)
+     VALUES (?, ?, ?, ?, ?)`,
+    location.name,
+    location.region,
+    location.latitude,
+    location.longitude,
+    new Date().toISOString(),
+  );
+  return location;
+}
+
+/** Returns all user-defined rivers in creation order. */
+export function getCustomRivers() {
+  const db = getDatabase();
+  return db.getAllSync(
+    `SELECT name, region, latitude, longitude
+     FROM custom_rivers
+     ORDER BY created_at DESC, id DESC`,
+  );
+}
 
 /** Atomically saves a river observation and all station measurements to SQLite. */
 export function saveObservation({ location, date, stations }) {

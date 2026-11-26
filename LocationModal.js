@@ -1,7 +1,22 @@
-import { Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 import MapIcon from './assets/icons/map.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
+import PlusIcon from './assets/icons/plus.svg';
+import { getCustomRivers, saveCustomRiver } from './observationStorage';
 
 export const riverLocations = [
   // Malang Raya (top of list)
@@ -49,6 +64,35 @@ const openInGoogleMaps = (location) => {
   Linking.openURL(url).catch(() => {});
 };
 
+const initialRiverForm = { name: '', region: '', latitude: '', longitude: '' };
+
+const parseCoordinate = (value) => {
+  const normalized = value.trim().replace(',', '.');
+  if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalized)) {
+    return null;
+  }
+  const coordinate = Number(normalized);
+  return Number.isFinite(coordinate) ? coordinate : null;
+};
+
+const sanitizeCoordinateInput = (value) => {
+  let result = '';
+  let hasDecimal = false;
+
+  for (const character of value.replace(',', '.')) {
+    if (character >= '0' && character <= '9') {
+      result += character;
+    } else if (character === '-' && result.length === 0) {
+      result = character;
+    } else if (character === '.' && !hasDecimal) {
+      result += character;
+      hasDecimal = true;
+    }
+  }
+
+  return result;
+};
+
 /** Lets the user select a river location from the provided list. */
 export default function LocationModal({
   visible,
@@ -58,9 +102,66 @@ export default function LocationModal({
   locations = riverLocations,
 }) {
   const { height } = useWindowDimensions();
-  const cardHeight = Math.min(560, Math.round(height * 0.72));
+  const cardHeight = Math.min(620, Math.round(height * 0.8));
+  const [customLocations, setCustomLocations] = useState([]);
+  const [addRiverVisible, setAddRiverVisible] = useState(false);
+  const [riverForm, setRiverForm] = useState(initialRiverForm);
+  const [formError, setFormError] = useState('');
+  const allLocations = useMemo(() => {
+    const customNames = new Set(customLocations.map(({ name }) => name.toLocaleLowerCase('id-ID')));
+    return [...customLocations, ...locations.filter(({ name }) => !customNames.has(name.toLocaleLowerCase('id-ID')))];
+  }, [customLocations, locations]);
 
+  useEffect(() => {
+    if (!visible) return;
+    try {
+      setCustomLocations(getCustomRivers());
+    } catch {
+      setCustomLocations([]);
+    }
+  }, [visible]);
+
+  const closeAddRiver = () => {
+    setAddRiverVisible(false);
+    setRiverForm(initialRiverForm);
+    setFormError('');
+  };
+
+  const updateField = (field, value) => {
+    setRiverForm((current) => ({ ...current, [field]: value }));
+    if (formError) setFormError('');
+  };
+
+  const handleSaveRiver = () => {
+    const name = riverForm.name.trim();
+    const region = riverForm.region.trim();
+    const latitude = parseCoordinate(riverForm.latitude);
+    const longitude = parseCoordinate(riverForm.longitude);
+
+    if (!name || !region || latitude === null || longitude === null) {
+      setFormError('Lengkapi nama, wilayah, serta koordinat sungai dengan benar.');
+      return;
+    }
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      setFormError('Lintang harus -90–90 dan bujur harus -180–180.');
+      return;
+    }
+    if (allLocations.some((location) => location.name.toLocaleLowerCase('id-ID') === name.toLocaleLowerCase('id-ID'))) {
+      setFormError('Nama sungai sudah tersedia di daftar.');
+      return;
+    }
+
+    try {
+      const location = saveCustomRiver({ name, region, latitude, longitude });
+      setCustomLocations((current) => [location, ...current]);
+      closeAddRiver();
+      onSelect(location);
+    } catch {
+      setFormError('Sungai gagal disimpan. Periksa data lalu coba lagi.');
+    }
+  };
   return (
+    <>
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <Pressable accessibilityRole="button" accessibilityLabel="Tutup pemilih lokasi" onPress={onClose} style={styles.overlay}>
         <Pressable onPress={(event) => event.stopPropagation()} style={[styles.card, { height: cardHeight }]}>
@@ -74,9 +175,17 @@ export default function LocationModal({
               <ArrowLeftIcon width={25} height={25} color="#000000" />
             </Pressable>
             <Text style={styles.title}>Pilih Lokasi Sungai</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Tambah sungai baru"
+              onPress={() => setAddRiverVisible(true)}
+              style={styles.addButton}
+            >
+              <PlusIcon width={18} height={18} color="#FFFFFF" />
+            </Pressable>
           </View>
           <ScrollView style={styles.locationScrollView} showsVerticalScrollIndicator contentContainerStyle={styles.locationList}>
-            {locations.map((location) => {
+            {allLocations.map((location) => {
               const isSelected = selectedLocation?.name === location.name;
 
               return (
@@ -111,6 +220,78 @@ export default function LocationModal({
         </Pressable>
       </Pressable>
     </Modal>
+
+      <Modal visible={addRiverVisible} transparent animationType="fade" statusBarTranslucent onRequestClose={closeAddRiver}>
+        <KeyboardAvoidingView style={styles.formOverlay} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeAddRiver} />
+          <View style={styles.formCard}>
+            <View style={styles.formHeader}>
+              <View style={styles.formIcon}><MapPointIcon width={28} height={28} /></View>
+              <View style={styles.formHeading}>
+                <Text style={styles.formTitle}>Tambah Sungai</Text>
+                <Text style={styles.formSubtitle}>Simpan lokasi untuk pengamatan berikutnya.</Text>
+              </View>
+            </View>
+
+            <Text style={styles.inputLabel}>Nama sungai</Text>
+            <TextInput
+              value={riverForm.name}
+              onChangeText={(value) => updateField('name', value)}
+              placeholder="Contoh: Sungai Widas"
+              placeholderTextColor="#829089"
+              style={styles.textInput}
+              autoCapitalize="words"
+              returnKeyType="next"
+            />
+            <Text style={styles.inputLabel}>Wilayah</Text>
+            <TextInput
+              value={riverForm.region}
+              onChangeText={(value) => updateField('region', value)}
+              placeholder="Kecamatan, kota, provinsi"
+              placeholderTextColor="#829089"
+              style={styles.textInput}
+              autoCapitalize="words"
+              returnKeyType="next"
+            />
+            <View style={styles.coordinateRow}>
+              <View style={styles.coordinateField}>
+                <Text style={styles.inputLabel}>Lintang</Text>
+                <TextInput
+                  value={riverForm.latitude}
+                  onChangeText={(value) => updateField('latitude', sanitizeCoordinateInput(value))}
+                  placeholder="-7.9805"
+                  placeholderTextColor="#829089"
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={styles.coordinateField}>
+                <Text style={styles.inputLabel}>Bujur</Text>
+                <TextInput
+                  value={riverForm.longitude}
+                  onChangeText={(value) => updateField('longitude', sanitizeCoordinateInput(value))}
+                  placeholder="112.6853"
+                  placeholderTextColor="#829089"
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+            <Text style={styles.coordinateHint}>Gunakan koordinat desimal dari lokasi sungai.</Text>
+            {formError ? <Text accessibilityRole="alert" style={styles.formError}>{formError}</Text> : null}
+
+            <View style={styles.formActions}>
+              <Pressable accessibilityRole="button" onPress={closeAddRiver} style={styles.cancelButton}>
+                <Text style={styles.cancelButtonText}>Batal</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" onPress={handleSaveRiver} style={styles.saveButton}>
+                <Text style={styles.saveButtonText}>Simpan Sungai</Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+    </>
   );
 }
 
@@ -152,6 +333,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 27,
     fontWeight: '700',
+  },
+  addButton: {
+    width: 46,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 23,
+    backgroundColor: '#005E36',
   },
   locationScrollView: {
     flex: 1,
@@ -205,4 +394,35 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '400',
   },
+  formOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.58)',
+  },
+  formCard: {
+    width: '100%',
+    maxWidth: 440,
+    padding: 22,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    boxShadow: '0px 6px 16px 0px #00000040',
+  },
+  formHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 18 },
+  formIcon: { width: 50, height: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: '#EAF5EF' },
+  formHeading: { flex: 1, marginLeft: 13 },
+  formTitle: { color: '#10251B', fontFamily: 'AvantGarde-Demi', fontSize: 21, lineHeight: 26, fontWeight: '700' },
+  formSubtitle: { marginTop: 2, color: '#63756C', fontFamily: 'AvantGarde Tx', fontSize: 12, lineHeight: 17 },
+  inputLabel: { marginTop: 11, marginBottom: 6, color: '#20392D', fontFamily: 'AvantGarde-Demi', fontSize: 12, lineHeight: 16, fontWeight: '700' },
+  textInput: { height: 48, paddingHorizontal: 14, borderWidth: 1, borderColor: '#CAD8D0', borderRadius: 14, color: '#10251B', backgroundColor: '#FAFCFB', fontFamily: 'AvantGarde Tx', fontSize: 14 },
+  coordinateRow: { flexDirection: 'row', gap: 12 },
+  coordinateField: { flex: 1 },
+  coordinateHint: { marginTop: 8, color: '#63756C', fontFamily: 'AvantGarde Tx', fontSize: 11, lineHeight: 15 },
+  formError: { marginTop: 10, color: '#B3261E', fontFamily: 'AvantGarde-Demi', fontSize: 12, lineHeight: 17 },
+  formActions: { flexDirection: 'row', gap: 10, marginTop: 20 },
+  cancelButton: { flex: 1, height: 48, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#CAD8D0', borderRadius: 15 },
+  cancelButtonText: { color: '#20392D', fontFamily: 'AvantGarde-Demi', fontSize: 13, fontWeight: '700' },
+  saveButton: { flex: 1.5, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#005E36' },
+  saveButtonText: { color: '#FFFFFF', fontFamily: 'AvantGarde-Demi', fontSize: 13, fontWeight: '700' },
 });

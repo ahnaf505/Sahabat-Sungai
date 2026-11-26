@@ -19,7 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DatePickerModal, { formatIndonesianDate } from './DatePickerModal';
 import LocationModal, { riverLocations } from './LocationModal';
-import { saveObservation } from './observationStorage';
+import { getCustomRivers, saveObservation } from './observationStorage';
 import ArrowLeftIcon from './assets/icons/arrow-left.svg';
 import BugIcon from './assets/icons/bug.svg';
 import CalendarWeekIcon from './assets/icons/calendar-week.svg';
@@ -173,10 +173,17 @@ const loadPersistedDraft = () => {
 
     const parsed = JSON.parse(raw);
     const selectedPoint = STATIONS.includes(parsed?.selectedPoint) ? parsed.selectedPoint : 1;
-    const savedLocationName = parsed?.selectedLocation?.name;
+    const savedLocation = parsed?.selectedLocation;
+    const storedLocations = getCustomRivers();
     const selectedLocation =
-      riverLocations.find((loc) => loc.name === savedLocationName) ?? riverLocations[0];
-    const selectedDate = deserializeDate(parsed?.selectedDate);
+      [...storedLocations, ...riverLocations].find((loc) => loc.name === savedLocation?.name) ??
+      (savedLocation &&
+      typeof savedLocation.name === 'string' &&
+      typeof savedLocation.region === 'string' &&
+      typeof savedLocation.latitude === 'number' &&
+      typeof savedLocation.longitude === 'number'
+        ? savedLocation
+        : riverLocations[0]);
     const customOrganisms = Array.isArray(parsed?.customOrganisms)
       ? parsed.customOrganisms.filter(
           (item) =>
@@ -246,7 +253,7 @@ export default function InputObservationScreen({ onBack }) {
         OBSERVATION_DRAFT_STORAGE_KEY,
         JSON.stringify({
           selectedPoint,
-          selectedLocation: selectedLocation ? { name: selectedLocation.name } : null,
+          selectedLocation,
           selectedDate: serializeDate(selectedDate),
           customOrganisms,
           observationsByPoint,
@@ -687,6 +694,7 @@ export default function InputObservationScreen({ onBack }) {
       <LocationModal
         visible={locationModalVisible}
         onClose={() => setLocationModalVisible(false)}
+        selectedLocation={selectedLocation}
         onSelect={(location) => {
           setSelectedLocation(location);
           setLocationModalVisible(false);
