@@ -1,6 +1,8 @@
+import { useRef, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { BlurTargetView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BarChartIcon from './assets/icons/bar-chart.svg';
@@ -10,6 +12,7 @@ import GraduationCapIcon from './assets/icons/graduation-cap.svg';
 import MapPointIcon from './assets/icons/map-point.svg';
 import NotificationIcon from './assets/icons/notification.svg';
 import { styles } from './App.styles';
+import NotificationModal from './NotificationModal';
 import RiverInfoCard from './RiverInfoCard';
 
 const tabs = [
@@ -51,6 +54,7 @@ const homeActions = [
   {
     key: 'lihat-analisis',
     label: 'Lihat Analisis',
+    path: '/analisis',
     Icon: BarChartIcon,
     iconWidth: 31,
     iconHeight: 31,
@@ -80,7 +84,7 @@ function useResponsiveMetrics() {
   return { insets, width, height, horizontalPadding, bottomNavClearance };
 }
 
-function HomeScreen() {
+function HomeScreen({ onOpenNotifications }) {
   const { insets, width, height, horizontalPadding, bottomNavClearance } = useResponsiveMetrics();
   const isCompactHeight = height < 720;
   const heroGap = isCompactHeight ? 10 : Math.min(24, Math.round(height * 0.025));
@@ -115,7 +119,14 @@ function HomeScreen() {
       <View style={[styles.brand, { paddingHorizontal: width < 360 ? 0 : 4 }]}>
         <Image source={require('./assets/water-drop.png')} style={styles.waterDrop} accessibilityLabel="Sahabat Sungai logo" />
         <Text style={styles.brandName}>Sahabat{'\n'}Sungai</Text>
-        <NotificationIcon width={46} height={46} style={styles.brandNotificationIcon} accessibilityLabel="Notifikasi" />
+        <Pressable
+          style={styles.brandNotificationButton}
+          onPress={onOpenNotifications}
+          accessibilityRole="button"
+          accessibilityLabel="Notifikasi"
+        >
+          <NotificationIcon width={46} height={46} />
+        </Pressable>
       </View>
 
       <View style={[styles.heroTextGroup, { marginTop: heroGap }]}>
@@ -246,50 +257,62 @@ function ProfilScreen() {
   );
 }
 
-const screens = [
-  <HomeScreen key="beranda" />,
+const otherScreens = [
   <PantauScreen key="pantau" />,
   <EdukasiScreen key="edukasi" />,
   <ProfilScreen key="profil" />,
 ];
 
 export default function App() {
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const blurTargetRef = useRef(null);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const screens = [
+    <HomeScreen key="beranda" onOpenNotifications={() => setNotificationsVisible(true)} />,
+    ...otherScreens,
+  ];
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        pointerEvents="none"
-        colors={['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA']}
-        locations={[0, 0.24, 0.48, 0.7]}
-        style={styles.lowerBackgroundGradient}
-      />
-      {cornerBushes.map(({ key, source, style, bottomOffset, label }) => (
-        <Image
-          key={key}
+      <BlurTargetView ref={blurTargetRef} style={styles.homeScreen}>
+        <LinearGradient
           pointerEvents="none"
-          source={source}
-          style={[
-            styles.cornerBush,
-            style,
-            { bottom: Math.max(insets.bottom, 16) + bottomOffset + 18 },
-          ]}
-          resizeMode="contain"
-          accessibilityLabel={label}
+          colors={['rgba(255, 255, 255, 0)', '#FFFFFF', '#FFFFFF', '#CDF1CA']}
+          locations={[0, 0.24, 0.48, 0.7]}
+          style={styles.lowerBackgroundGradient}
         />
-      ))}
+        {cornerBushes.map(({ key, source, style, bottomOffset, label }) => (
+          <Image
+            key={key}
+            pointerEvents="none"
+            source={source}
+            style={[
+              styles.cornerBush,
+              style,
+              { bottom: Math.max(insets.bottom, 16) + bottomOffset + 18 },
+            ]}
+            resizeMode="contain"
+            accessibilityLabel={label}
+          />
+        ))}
 
-      <View style={styles.pageViewport}>
-        <View style={[styles.pageTrack, { width: width * tabs.length }]}>
-          {screens.map((screen, index) => (
-            <View key={tabs[index].key} style={[styles.page, { width }]}>
-              {screen}
-            </View>
-          ))}
+        <View style={styles.pageViewport}>
+          <View style={[styles.pageTrack, { width: width * tabs.length }]}>
+            {screens.map((screen, index) => (
+              <View key={tabs[index].key} style={[styles.page, { width }]}>
+                {screen}
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
+      </BlurTargetView>
 
+      <NotificationModal
+        visible={notificationsVisible}
+        blurTarget={blurTargetRef}
+        onClose={() => setNotificationsVisible(false)}
+      />
       <StatusBar style="auto" />
     </View>
   );

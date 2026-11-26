@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
   brand: { flexDirection: 'row', alignItems: 'center' },
   waterDrop: { width: 60, height: 60 },
   brandName: { marginLeft: 12, color: '#005E36', fontFamily: 'AvantGarde-Demi', fontSize: 26, lineHeight: 25.42, fontWeight: '700', paddingVertical: 4 },
-  brandNotificationIcon: { marginLeft: 'auto', width: 46, height: 46 },
+  brandNotificationButton: { marginLeft: 'auto', width: 46, height: 46 },
   heroTextGroup: { paddingHorizontal: 12 },
   greeting: { color: '#000000', fontFamily: 'AvantGarde-Demi', fontSize: 25, lineHeight: 30, fontWeight: '700' },
   subtext: { marginTop: 4, maxWidth: 300, color: '#000000', fontFamily: 'AvantGarde Tx', fontSize: 15, lineHeight: 19, fontWeight: '400' },
