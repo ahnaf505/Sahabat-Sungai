@@ -208,3 +208,20 @@ export function getLatestObservationByRiver(riverName) {
 
   return hydrateObservation(db, observation);
 }
+
+/** Returns the total number of saved observation records. */
+export function getObservationCount() {
+  const db = getDatabase();
+  const row = db.getFirstSync('SELECT COUNT(*) AS count FROM observations');
+  return Number(row?.count) || 0;
+}
+
+/** Atomically deletes all saved observation records and related station/organism rows. */
+export function clearAllObservations() {
+  const db = getDatabase();
+  db.withTransactionSync(() => {
+    db.runSync('DELETE FROM observation_organisms');
+    db.runSync('DELETE FROM observation_stations');
+    db.runSync('DELETE FROM observations');
+  });
+}
