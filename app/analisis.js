@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
-import LocationModal, { riverLocations } from '../LocationModal';
+import { formatIndonesianDate } from '../DatePickerModal';
+import LocationModal from '../LocationModal';
+import { getLatestObservationByRiver, getSavedAnalysisRivers } from '../observationStorage';
 import ArrowLeftIcon from '../assets/icons/arrow-left.svg';
 import BarChartIcon from '../assets/icons/bar-chart.svg';
 import ChevronRightIcon from '../assets/icons/chevron-right.svg';
@@ -19,10 +21,6 @@ import SunIcon from '../assets/icons/sun.svg';
 import ThermometerIcon from '../assets/icons/thermometer.svg';
 import BiodiversityFillIcon from '../assets/icons/biodiversity-fill.svg';
 import BiodiversityLineIcon from '../assets/icons/biodiversity-line.svg';
-
-
-
-
 
 const backgroundGradients = [
   {
@@ -39,6 +37,55 @@ const backgroundGradients = [
   },
 ];
 
+// Tolerance weights (1-10, higher = cleaner water) aligned with bioindicator sensitivity groups.
+const TAXON_SCORES = [
+  { terms: ['plecoptera'], score: 9 },
+  { terms: ['ephemeroptera', 'mayfly', 'lalat sehari'], score: 8 },
+  { terms: ['trichoptera', 'caddisfly'], score: 8 },
+  { terms: ['megaloptera'], score: 7 },
+  { terms: ['odonata', 'capung', 'damselfly', 'dragonfly', 'ept'], score: 6 },
+  { terms: ['coleoptera', 'kumbang', 'hemiptera', 'crustacea', 'udang', 'kepiting', 'bivalvia', 'kerang'], score: 5 },
+  { terms: ['mollusca'], score: 4 },
+  { terms: ['gastropoda', 'siput', 'keong', 'snail'], score: 3 },
+  { terms: ['diptera', 'chironomidae', 'chironomid', 'nyamuk', 'lalat'], score: 2 },
+  { terms: ['hirudinea', 'lintah', 'annelida'], score: 2 },
+  { terms: ['oligochaeta', 'tubifex', 'cacing'], score: 1 },
+];
+const DEFAULT_TAXON_SCORE = 5;
+
+const getTaxonScore = (organismKey, organismName) => {
+  const haystack = `${organismKey ?? ''} ${organismName ?? ''}`.toLowerCase();
+  for (const entry of TAXON_SCORES) {
+    if (entry.terms.some((term) => haystack.includes(term))) {
+      return entry.score;
+    }
+  }
+  return DEFAULT_TAXON_SCORE;
+};
+
+const formatIndonesianNumber = (value, maxDecimals = 2, minDecimals = 0) => {
+  if (!Number.isFinite(value)) {
+    return '0';
+  }
+  const fixed = value.toFixed(maxDecimals);
+  let [intPart, decPart = ''] = fixed.split('.');
+  while (decPart.length > minDecimals && decPart.endsWith('0')) {
+    decPart = decPart.slice(0, -1);
+  }
+  return decPart.length > 0 ? `${intPart},${decPart}` : intPart;
+};
+
+const formatIsoDateLabel = (isoDate) => {
+  if (typeof isoDate !== 'string') {
+    return '';
+  }
+  const parts = isoDate.split('-').map(Number);
+  if (parts.length !== 3 || parts.some((n) => !Number.isInteger(n))) {
+    return isoDate;
+  }
+  const [year, month, day] = parts;
+  return formatIndonesianDate(new Date(year, month - 1, day));
+};
 
 const hslToHex = (hue, saturation, lightness) => {
   const s = saturation / 100;
@@ -61,21 +108,146 @@ const getHighContrastColor = (index, total) => {
   return hslToHex(hue, saturation, lightness);
 };
 
-const baseOrganismRows = [
-  { label: 'Gastropoda', percentage: 28 },
-  { label: 'Odonata', percentage: 22 },
-  { label: 'Ephemeroptera', percentage: 18 },
-  { label: 'Trichoptera', percentage: 14 },
-  { label: 'Diptera', percentage: 10 },
-  { label: 'Coleoptera', percentage: 8 },
-];
+const aggregateOrganisms = (stations) => {
+  const totalsByTaxon = new Map();
 
-const organismRows = baseOrganismRows.map((item, index, list) => ({
-  ...item,
-  color: getHighContrastColor(index, list.length),
-}));
+  for (const station of stations) {
+    for (const organism of station.organisms ?? []) {
+      const count = Math.max(0, Number(organism.count) || 0);
+      const name = (organism.organism_name ?? organism.name ?? '').trim();
+      const key = (organism.organism_key ?? organism.key ?? name).trim();
+      const mapKey = name.toLowerCase() || key.toLowerCase();
+      if (!mapKey) {
+        continue;
+      }
 
+      const existing = totalsByTaxon.get(mapKey);
+      if (existing) {
+        existing.count += count;
+      } else {
+        totalsByTaxon.set(mapKey, {
+          key: key || mapKey,
+          label: name || key,
+          count,
+          score: getTaxonScore(key, name),
+        });
+      }
+    }
+  }
 
+  const active = Array.from(totalsByTaxon.values())
+    .filter((item) => item.count > 0)
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+
+  const totalCount = active.reduce((sum, item) => sum + item.count, 0);
+  if (totalCount === 0) {
+    return { totalCount: 0, active: [], rows: [] };
+  }
+
+  // Largest-remainder rounding keeps displayed legend percentages summing to 100%.
+  const withExact = active.map((item, index) => {
+    const exact = (item.count / totalCount) * 100;
+    const floorVal = Math.floor(exact);
+    return {
+      ...item,
+      index,
+      percentage: floorVal,
+      remainder: exact - floorVal,
+    };
+  });
+
+  let remainderPoints = 100 - withExact.reduce((sum, item) => sum + item.percentage, 0);
+  const byRemainder = [...withExact].sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+  for (let i = 0; i < remainderPoints && i < byRemainder.length; i += 1) {
+    byRemainder[i].percentage += 1;
+  }
+
+  const rows = withExact.map((item, index, list) => ({
+    label: item.label,
+    count: item.count,
+    percentage: item.percentage,
+    color: getHighContrastColor(index, list.length),
+  }));
+
+  return { totalCount, active, rows };
+};
+
+const calculateShannonDiversity = (activeOrganisms, totalCount) => {
+  if (totalCount <= 0 || activeOrganisms.length === 0) {
+    return 0;
+  }
+  let index = 0;
+  for (const item of activeOrganisms) {
+    const proportion = item.count / totalCount;
+    if (proportion > 0) {
+      index -= proportion * Math.log(proportion);
+    }
+  }
+  return Math.abs(index) < 1e-9 ? 0 : index;
+};
+
+const getWaterQualityStatus = (ikaScore, totalCount) => {
+  if (totalCount <= 0) {
+    return { label: 'Nihil', cardBg: '#FBEBD5', badgeBg: '#C16500', showWarning: true };
+  }
+  if (ikaScore >= 6.5) {
+    return { label: 'Bersih', cardBg: '#D5EED4', badgeBg: '#005E36', showWarning: false };
+  }
+  if (ikaScore >= 4.5) {
+    return { label: 'Cukup Baik', cardBg: '#FDE8BD', badgeBg: '#B45309', showWarning: false };
+  }
+  if (ikaScore >= 2.5) {
+    return { label: 'Kotor', cardBg: '#FBEBD5', badgeBg: '#C16500', showWarning: true };
+  }
+  return { label: 'Tercemar', cardBg: '#FBD8CA', badgeBg: '#B91C1C', showWarning: true };
+};
+
+const formatParameterRange = (stations, fieldKey, unit) => {
+  const values = stations
+    .map((station) => Number(station[fieldKey]))
+    .filter((value) => Number.isFinite(value));
+
+  if (values.length === 0) {
+    return '-';
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const minText = formatIndonesianNumber(min, 2, 0);
+  const maxText = formatIndonesianNumber(max, 2, 0);
+  return min === max ? `${minText}${unit}` : `${minText} – ${maxText}${unit}`;
+};
+
+const buildAnalysisFromObservation = (observation) => {
+  if (!observation || !Array.isArray(observation.stations) || observation.stations.length === 0) {
+    return null;
+  }
+
+  const { stations } = observation;
+  const { totalCount, active, rows } = aggregateOrganisms(stations);
+  const ikaValue =
+    totalCount > 0
+      ? active.reduce((sum, item) => sum + item.count * item.score, 0) / totalCount
+      : 0;
+  const diversityValue = calculateShannonDiversity(active, totalCount);
+  const status = getWaterQualityStatus(ikaValue, totalCount);
+
+  return {
+    riverName: observation.river_name,
+    riverRegion: observation.river_region,
+    observedAtLabel: formatIsoDateLabel(observation.observed_at),
+    stationCount: stations.length,
+    ikaScore: formatIndonesianNumber(ikaValue, 2, 2),
+    status,
+    diversityScore: formatIndonesianNumber(diversityValue, 2, 2),
+    organismRows: rows,
+    parameters: {
+      suhu: formatParameterRange(stations, 'suhu', ' °C'),
+      ph: formatParameterRange(stations, 'ph', ''),
+      kecerahan: formatParameterRange(stations, 'kecerahan', ' cm'),
+    },
+  };
+};
 
 function polarToCartesian(cx, cy, radius, angleInDegrees) {
   const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
@@ -161,13 +333,88 @@ function DonutChart({ data, size = 126, thickness = 26, gapDegrees = 2 }) {
 export default function AnalisisScreen({ analysisData = null }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const [savedRivers, setSavedRivers] = useState([]);
+  const [selectedRiverName, setSelectedRiverName] = useState(null);
+  const selectedRiverNameRef = useRef(null);
+  const [loadedAnalysis, setLoadedAnalysis] = useState(null);
   const [locationsVisible, setLocationsVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(riverLocations[0]);
+
+  const loadRiverAnalysis = useCallback((preferredRiverName) => {
+    try {
+      const rivers = getSavedAnalysisRivers();
+      setSavedRivers(rivers);
+
+      if (rivers.length === 0) {
+        selectedRiverNameRef.current = null;
+        setSelectedRiverName(null);
+        setLoadedAnalysis(null);
+        return;
+      }
+
+      const activeRiver =
+        rivers.find((river) => river.name === preferredRiverName) ?? rivers[0];
+      selectedRiverNameRef.current = activeRiver.name;
+      setSelectedRiverName(activeRiver.name);
+      const observation = getLatestObservationByRiver(activeRiver.name);
+      setLoadedAnalysis(buildAnalysisFromObservation(observation));
+    } catch {
+      setSavedRivers([]);
+      selectedRiverNameRef.current = null;
+      setSelectedRiverName(null);
+      setLoadedAnalysis(null);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (analysisData) {
+        return;
+      }
+      loadRiverAnalysis(selectedRiverNameRef.current);
+    }, [analysisData, loadRiverAnalysis]),
+  );
+
+  const handleSelectRiver = (location) => {
+    selectedRiverNameRef.current = location.name;
+    setSelectedRiverName(location.name);
+    setLocationsVisible(false);
+    try {
+      const observation = getLatestObservationByRiver(location.name);
+      setLoadedAnalysis(buildAnalysisFromObservation(observation));
+    } catch {
+      setLoadedAnalysis(null);
+    }
+  };
+
+  const effectiveAnalysis = analysisData ?? loadedAnalysis;
+  const selectedLocation =
+    savedRivers.find((river) => river.name === selectedRiverName) ?? savedRivers[0] ?? null;
+  const hasMultipleRivers = savedRivers.length > 1;
+  const statusCardBg = effectiveAnalysis?.status?.cardBg ?? '#FBEBD5';
+  const statusBadgeBg = effectiveAnalysis?.status?.badgeBg ?? '#C16500';
+  const statusLabel = effectiveAnalysis?.status?.label ?? 'Kotor';
+  const showWarningBadge = effectiveAnalysis?.status?.showWarning ?? true;
   const isCompact = width < 380;
   const waterDropSize = isCompact ? 86 : 104;
   const warningBadgeSize = isCompact ? 31 : 37;
   const donutSize = isCompact ? 104 : 126;
   const cardPadding = isCompact ? 18 : 26;
+
+  const riverCardContent = selectedLocation ? (
+    <>
+      <MapPointIcon width={34} height={34} accessibilityLabel="Lokasi sungai" />
+      <View style={styles.riverTextGroup}>
+        <Text style={styles.riverEyebrow}>Sungai Dianalisis</Text>
+        <Text style={styles.riverName} numberOfLines={1}>{selectedLocation.name}</Text>
+        <Text style={styles.riverRegion} numberOfLines={1}>
+          {effectiveAnalysis?.observedAtLabel
+            ? `${selectedLocation.region} • ${effectiveAnalysis.observedAtLabel}`
+            : selectedLocation.region}
+        </Text>
+      </View>
+      {hasMultipleRivers ? <ChevronRightIcon width={11} height={19} color="#000000" /> : null}
+    </>
+  ) : null;
 
   return (
     <View style={styles.screen}>
@@ -201,21 +448,7 @@ export default function AnalisisScreen({ analysisData = null }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingTop: 0, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
       >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Pilih sungai yang dianalisis: ${selectedLocation.name}, ${selectedLocation.region}`}
-          onPress={() => setLocationsVisible(true)}
-          style={styles.riverCard}
-        >
-          <MapPointIcon width={34} height={34} accessibilityLabel="Lokasi sungai" />
-          <View style={styles.riverTextGroup}>
-            <Text style={styles.riverEyebrow}>Sungai Dianalisis</Text>
-            <Text style={styles.riverName} numberOfLines={1}>{selectedLocation.name}</Text>
-            <Text style={styles.riverRegion} numberOfLines={1}>{selectedLocation.region}</Text>
-          </View>
-          <ChevronRightIcon width={11} height={19} color="#000000" />
-        </Pressable>
-        {!analysisData ? (
+        {!effectiveAnalysis ? (
           <View style={[styles.emptyCard, { padding: cardPadding }]}>
             <View style={styles.emptyIconBadge}>
               <BarChartIcon width={36} height={36} color="#005E36" />
@@ -235,18 +468,39 @@ export default function AnalisisScreen({ analysisData = null }) {
           </View>
         ) : (
           <>
-            <View style={styles.summaryCard}>
+            {selectedLocation ? (
+              hasMultipleRivers ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Pilih sungai yang dianalisis: ${selectedLocation.name}, ${selectedLocation.region}`}
+                  onPress={() => setLocationsVisible(true)}
+                  style={styles.riverCard}
+                >
+                  {riverCardContent}
+                </Pressable>
+              ) : (
+                <View style={styles.riverCard}>{riverCardContent}</View>
+              )
+            ) : null}
+
+            <View style={[styles.summaryCard, { backgroundColor: statusCardBg }]}>
               <View style={[styles.waterMarkBox, { width: waterDropSize, height: waterDropSize }]}>
                 <WaterDropIcon width={waterDropSize} height={waterDropSize} accessibilityLabel="Status kualitas air" />
-                <WarningBadgeIcon width={warningBadgeSize} height={warningBadgeSize} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
+                {showWarningBadge ? (
+                  <WarningBadgeIcon width={warningBadgeSize} height={warningBadgeSize} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
+                ) : null}
               </View>
               <View style={styles.summaryContent}>
                 <Text style={styles.ikaLabel}>IKA</Text>
                 <View style={styles.scoreRow}>
-                  <Text style={styles.ikaScore} numberOfLines={1} adjustsFontSizeToFit>3,57</Text>
-                  <View style={styles.statusBadge}><Text style={styles.statusBadgeText}>Kotor</Text></View>
+                  <Text style={styles.ikaScore} numberOfLines={1} adjustsFontSizeToFit>{effectiveAnalysis.ikaScore}</Text>
+                  <View style={[styles.statusBadge, { backgroundColor: statusBadgeBg }]}>
+                    <Text style={styles.statusBadgeText}>{statusLabel}</Text>
+                  </View>
                 </View>
-                <Text style={styles.summaryCaption}>Berdasarkan skor bioindikator makroinvertebrata</Text>
+                <Text style={styles.summaryCaption}>
+                  {`Gabungan ${effectiveAnalysis.stationCount ?? 3} titik pengamatan bioindikator`}
+                </Text>
               </View>
             </View>
             <View style={styles.detailCard}>
@@ -257,22 +511,28 @@ export default function AnalisisScreen({ analysisData = null }) {
               <DiversityLeafIcon width={29} height={32} accessibilityLabel="Keanekaragaman" />
               <View style={styles.detailCardTextGroup}>
                 <Text style={styles.detailCardTitle}>Keanekaragaman H’</Text>
-                <Text style={styles.detailCardScore}>1,60</Text>
+                <Text style={styles.detailCardScore}>{effectiveAnalysis.diversityScore}</Text>
               </View>
             </View>
 
             <View style={[styles.card, { padding: cardPadding }]}>
               <View style={styles.cardHeading}><PieChartIcon width={32} height={32} accessibilityLabel="Komposisi organisme" /><Text style={styles.cardTitle}>Komposisi Organisme</Text></View>
               <View style={styles.compositionContent}>
-                <DonutChart data={organismRows} size={donutSize} thickness={isCompact ? 22 : 26} />
+                <DonutChart data={effectiveAnalysis.organismRows} size={donutSize} thickness={isCompact ? 22 : 26} />
                 <View style={styles.legend}>
-                  {organismRows.map(({ label, percentage, color }) => (
-                    <View key={label} style={styles.legendRow}>
-                      <View style={[styles.legendDot, { backgroundColor: color }]} />
-                      <Text style={styles.legendLabel} numberOfLines={1} adjustsFontSizeToFit>{label}</Text>
-                      <Text style={styles.legendValue}>{`${percentage}%`}</Text>
-                    </View>
-                  ))}
+                  {effectiveAnalysis.organismRows.length > 0 ? (
+                    effectiveAnalysis.organismRows.map(({ label, percentage, color }) => (
+                      <View key={label} style={styles.legendRow}>
+                        <View style={[styles.legendDot, { backgroundColor: color }]} />
+                        <Text style={styles.legendLabel} numberOfLines={1} adjustsFontSizeToFit>{label}</Text>
+                        <Text style={styles.legendValue}>{`${percentage}%`}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.emptyLegendText}>
+                      Belum ada organisme tercatat pada 3 titik pengamatan.
+                    </Text>
+                  )}
                 </View>
               </View>
             </View>
@@ -280,24 +540,25 @@ export default function AnalisisScreen({ analysisData = null }) {
             <View style={[styles.card, { padding: cardPadding }]}>
               <View style={styles.cardHeading}><LabFlaskIcon width={24} height={28} accessibilityLabel="Parameter pendukung" /><Text style={styles.cardTitle}>Parameter Pendukung</Text></View>
               <View style={styles.parameterGrid}>
-                <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>25 °C</Text></View>
+                <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>{effectiveAnalysis.parameters.suhu}</Text></View>
                 <View style={styles.divider} />
-                <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>6,8 – 7,6</Text></View>
+                <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>{effectiveAnalysis.parameters.ph}</Text></View>
                 <View style={styles.divider} />
-                <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>55,5 – 64 cm</Text></View>
+                <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>{effectiveAnalysis.parameters.kecerahan}</Text></View>
               </View>
             </View>
           </>
         )}
       </ScrollView>
-      <LocationModal
-        visible={locationsVisible}
-        onClose={() => setLocationsVisible(false)}
-        onSelect={(location) => {
-          setSelectedLocation(location);
-          setLocationsVisible(false);
-        }}
-      />
+      {hasMultipleRivers ? (
+        <LocationModal
+          visible={locationsVisible}
+          locations={savedRivers}
+          selectedLocation={selectedLocation}
+          onClose={() => setLocationsVisible(false)}
+          onSelect={handleSelectRiver}
+        />
+      ) : null}
     </View>
   );
 }
@@ -343,6 +604,7 @@ const styles = StyleSheet.create({
   legendDot: { width: 14, height: 14, marginRight: 10, borderRadius: 7 },
   legendLabel: { flex: 1, marginRight: 8, color: '#101010', fontFamily: 'Poppins-Regular', fontSize: 14, lineHeight: 18 },
   legendValue: { color: '#101010', fontFamily: 'Poppins-SemiBold', fontSize: 14, lineHeight: 18 },
+  emptyLegendText: { color: '#4B5563', fontFamily: 'Poppins-Regular', fontSize: 13, lineHeight: 19 },
   parameterGrid: { marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   parameter: { flex: 1, alignItems: 'center' },
   divider: { width: StyleSheet.hairlineWidth, alignSelf: 'stretch', backgroundColor: '#777' },

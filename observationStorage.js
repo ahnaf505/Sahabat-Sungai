@@ -47,6 +47,8 @@ const getDatabase = () => {
 
       CREATE INDEX IF NOT EXISTS idx_observations_observed_at
         ON observations(observed_at DESC, id DESC);
+      CREATE INDEX IF NOT EXISTS idx_observations_river_observed_at
+        ON observations(river_name, observed_at DESC, id DESC);
       CREATE INDEX IF NOT EXISTS idx_observation_stations_obs_id
         ON observation_stations(observation_id);
       CREATE INDEX IF NOT EXISTS idx_observation_organisms_station_id
@@ -114,16 +116,7 @@ export function saveObservation({ location, date, stations }) {
   return observationId;
 }
 
-/** Returns the most recently saved observation with its stations and organisms, or null. */
-export function getLatestObservation() {
-  const db = getDatabase();
-  const observation = db.getFirstSync(
-    `SELECT id, river_name, river_region, latitude, longitude, observed_at, created_at
-     FROM observations
-     ORDER BY observed_at DESC, id DESC
-     LIMIT 1`,
-  );
-
+const hydrateObservation = (db, observation) => {
   if (!observation) {
     return null;
   }
@@ -151,4 +144,67 @@ export function getLatestObservation() {
     ...observation,
     stations: stationsWithOrganisms,
   };
+};
+
+/** Returns the most recently saved observation with its stations and organisms, or null. */
+export function getLatestObservation() {
+  const db = getDatabase();
+  const observation = db.getFirstSync(
+    `SELECT id, river_name, river_region, latitude, longitude, observed_at, created_at
+     FROM observations
+     ORDER BY observed_at DESC, id DESC
+     LIMIT 1`,
+  );
+
+  return hydrateObservation(db, observation);
+}
+
+/** Returns distinct rivers with saved observations, ordered by each river's latest record. */
+export function getSavedAnalysisRivers() {
+  const db = getDatabase();
+  const rows = db.getAllSync(
+    `SELECT id, river_name, river_region, latitude, longitude, observed_at, created_at
+     FROM observations o
+     WHERE id = (
+       SELECT o2.id
+       FROM observations o2
+       WHERE o2.river_name = o.river_name
+         AND EXISTS (
+           SELECT 1
+           FROM observation_stations s
+           WHERE s.observation_id = o2.id
+         )
+       ORDER BY o2.observed_at DESC, o2.id DESC
+       LIMIT 1
+     )
+     ORDER BY observed_at DESC, id DESC`,
+  );
+
+  return rows.map((row) => ({
+    name: row.river_name,
+    region: row.river_region,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    observedAt: row.observed_at,
+    createdAt: row.created_at,
+  }));
+}
+
+/** Returns the latest saved observation for a given river name, or null. */
+export function getLatestObservationByRiver(riverName) {
+  if (!riverName) {
+    return null;
+  }
+
+  const db = getDatabase();
+  const observation = db.getFirstSync(
+    `SELECT id, river_name, river_region, latitude, longitude, observed_at, created_at
+     FROM observations
+     WHERE river_name = ?
+     ORDER BY observed_at DESC, id DESC
+     LIMIT 1`,
+    riverName,
+  );
+
+  return hydrateObservation(db, observation);
 }
