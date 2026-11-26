@@ -96,7 +96,7 @@ const parseNumericInput = (raw, { allowNegative = false, maxDecimals = 2 } = {})
   return Number.isFinite(numeric) ? numeric : null;
 };
 
-const bioindicators = [
+const defaultBioindicators = [
   {
     key: 'gastropoda',
     name: 'Gastropoda',
@@ -155,6 +155,7 @@ const loadPersistedDraft = () => {
   const fallback = {
     selectedPoint: 1,
     selectedDate: getToday(),
+    customOrganisms: [],
     observationsByPoint: createInitialObservations(),
   };
 
@@ -167,16 +168,30 @@ const loadPersistedDraft = () => {
     const parsed = JSON.parse(raw);
     const selectedPoint = STATIONS.includes(parsed?.selectedPoint) ? parsed.selectedPoint : 1;
     const selectedDate = deserializeDate(parsed?.selectedDate);
+    const customOrganisms = Array.isArray(parsed?.customOrganisms)
+      ? parsed.customOrganisms.filter(
+          (item) =>
+            item &&
+            typeof item.key === 'string' &&
+            item.key.length > 0 &&
+            typeof item.name === 'string' &&
+            item.name.trim().length > 0,
+        )
+      : [];
     const observationsByPoint = Object.fromEntries(
       STATIONS.map((point) => {
         const savedStation = parsed?.observationsByPoint?.[point];
         const savedCounts = savedStation?.counts ?? {};
         const savedParams = savedStation?.parameters ?? {};
+        const customCounts = Object.fromEntries(
+          customOrganisms.map(({ key }) => [key, Math.max(0, Number(savedCounts[key]) || 0)]),
+        );
 
         return [
           point,
           {
             counts: {
+              ...customCounts,
               gastropoda: Math.max(0, Number(savedCounts.gastropoda) || 0),
               odonata: Math.max(0, Number(savedCounts.odonata) || 0),
             },
@@ -191,7 +206,7 @@ const loadPersistedDraft = () => {
       }),
     );
 
-    return { selectedPoint, selectedDate, observationsByPoint };
+    return { selectedPoint, selectedDate, customOrganisms, observationsByPoint };
   } catch {
     return fallback;
   }
@@ -202,6 +217,10 @@ export default function InputObservationScreen({ onBack }) {
   const [selectedPoint, setSelectedPoint] = useState(initialDraft.selectedPoint);
   const [selectedDate, setSelectedDate] = useState(initialDraft.selectedDate);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [customOrganisms, setCustomOrganisms] = useState(initialDraft.customOrganisms);
+  const [addOrganismModalVisible, setAddOrganismModalVisible] = useState(false);
+  const [newOrganismName, setNewOrganismName] = useState('');
+  const [newOrganismError, setNewOrganismError] = useState('');
   const [observationsByPoint, setObservationsByPoint] = useState(initialDraft.observationsByPoint);
   const [invalidFieldsByPoint, setInvalidFieldsByPoint] = useState({});
   const [feedbackModal, setFeedbackModal] = useState(null);
@@ -217,13 +236,14 @@ export default function InputObservationScreen({ onBack }) {
         JSON.stringify({
           selectedPoint,
           selectedDate: serializeDate(selectedDate),
+          customOrganisms,
           observationsByPoint,
         }),
       );
     } catch {
       // Ignore storage write failures so input remains responsive.
     }
-  }, [selectedPoint, selectedDate, observationsByPoint]);
+  }, [selectedPoint, selectedDate, customOrganisms, observationsByPoint]);
 
   const currentStationData = selectedPoint ? observationsByPoint[selectedPoint] : null;
   const counts = currentStationData?.counts ?? INITIAL_COUNTS;
@@ -293,6 +313,34 @@ export default function InputObservationScreen({ onBack }) {
     }
   };
 
+  const allBioindicators = [...defaultBioindicators, ...customOrganisms];
+
+  const closeAddOrganismModal = () => {
+    setAddOrganismModalVisible(false);
+    setNewOrganismName('');
+    setNewOrganismError('');
+  };
+
+  const handleAddOrganism = () => {
+    const trimmedName = newOrganismName.trim();
+    if (!trimmedName) {
+      setNewOrganismError('Nama organisme tidak boleh kosong.');
+      return;
+    }
+
+    const exists = allBioindicators.some(
+      (item) => item.name.toLowerCase() === trimmedName.toLowerCase(),
+    );
+    if (exists) {
+      setNewOrganismError('Organisme sudah ada di daftar.');
+      return;
+    }
+
+    const key = `custom-${Date.now()}`;
+    setCustomOrganisms((prev) => [...prev, { key, name: trimmedName }]);
+    closeAddOrganismModal();
+  };
+
   const handleSave = () => {
     const missingFields = [];
     const nextInvalidFieldsByPoint = {};
@@ -329,6 +377,7 @@ export default function InputObservationScreen({ onBack }) {
 
     setSelectedPoint(1);
     setSelectedDate(getToday());
+    setCustomOrganisms([]);
     setObservationsByPoint(createInitialObservations());
     setInvalidFieldsByPoint({});
     setFeedbackModal({
@@ -425,16 +474,18 @@ export default function InputObservationScreen({ onBack }) {
             </View>
             <View style={styles.sectionDivider} />
             <View style={styles.bioindicatorList}>
-              {bioindicators.map(({ key, name, source, imageStyle, accessibilityLabel }) => (
+              {allBioindicators.map(({ key, name, source, imageStyle, accessibilityLabel }) => (
                 <View key={key} style={styles.bioindicatorItem}>
-                  <View style={styles.bioindicatorImageBox}>
-                    <Image
-                      source={source}
-                      style={imageStyle}
-                      resizeMode="contain"
-                      accessibilityLabel={accessibilityLabel}
-                    />
-                  </View>
+                  {source ? (
+                    <View style={styles.bioindicatorImageBox}>
+                      <Image
+                        source={source}
+                        style={imageStyle}
+                        resizeMode="contain"
+                        accessibilityLabel={accessibilityLabel}
+                      />
+                    </View>
+                  ) : null}
                   <View style={styles.bioindicatorInfo}>
                     <Text style={styles.bioindicatorName}>{name}</Text>
                   </View>
@@ -460,7 +511,11 @@ export default function InputObservationScreen({ onBack }) {
                 </View>
               ))}
             </View>
-            <Pressable style={styles.listActionButton} accessibilityRole="button">
+            <Pressable
+              style={styles.listActionButton}
+              accessibilityRole="button"
+              onPress={() => setAddOrganismModalVisible(true)}
+            >
               <PlusIcon width={12} height={12} />
               <Text style={styles.listActionButtonLabel}>Tambah Organisme</Text>
             </Pressable>
@@ -555,6 +610,52 @@ export default function InputObservationScreen({ onBack }) {
         onSelect={setSelectedDate}
         onClose={() => setDatePickerVisible(false)}
       />
+
+      <Modal
+        visible={addOrganismModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeAddOrganismModal}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={closeAddOrganismModal}>
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            <Text style={styles.modalTitle}>Tambah Organisme</Text>
+            <TextInput
+              style={[styles.addOrganismInput, Boolean(newOrganismError) && styles.addOrganismInputError]}
+              value={newOrganismName}
+              onChangeText={(text) => {
+                setNewOrganismName(text);
+                if (newOrganismError) {
+                  setNewOrganismError('');
+                }
+              }}
+              placeholder="Nama organisme"
+              placeholderTextColor="#8C8C8C"
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={handleAddOrganism}
+              accessibilityLabel="Nama organisme"
+            />
+            {newOrganismError ? <Text style={styles.addOrganismErrorText}>{newOrganismError}</Text> : null}
+            <View style={styles.modalActionRow}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={closeAddOrganismModal}
+                style={styles.modalCancelButton}
+              >
+                <Text style={styles.modalCancelLabel}>Batal</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={handleAddOrganism}
+                style={styles.modalConfirmButton}
+              >
+                <Text style={styles.modalOkLabel}>Tambah</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       <Modal
         visible={Boolean(feedbackModal)}
@@ -1004,5 +1105,56 @@ const styles = StyleSheet.create({
   modalOkLabel: {
     ...poppinsSemiBold16,
     color: '#FFFFFF',
+  },
+  addOrganismInput: {
+    width: '100%',
+    height: 42,
+    marginTop: 14,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#C4C3C3',
+    backgroundColor: '#FFFFFF',
+    color: '#000000',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+    includeFontPadding: false,
+  },
+  addOrganismInputError: {
+    borderColor: '#B91C1C',
+  },
+  addOrganismErrorText: {
+    width: '100%',
+    marginTop: 6,
+    color: '#B91C1C',
+    fontFamily: 'Poppins-Regular',
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  modalActionRow: {
+    width: '100%',
+    marginTop: 18,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  modalCancelButton: {
+    flex: 1,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: '#EDF7F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCancelLabel: {
+    ...poppinsSemiBold16,
+    color: '#1C5C3D',
+  },
+  modalConfirmButton: {
+    flex: 1,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: '#1C5C3D',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
