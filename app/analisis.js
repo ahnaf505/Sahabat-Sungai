@@ -154,7 +154,7 @@ function DonutChart({ data, size = 126, thickness = 26, gapDegrees = 2 }) {
   );
 }
 
-export default function AnalisisScreen() {
+export default function AnalisisScreen({ analysisData = null }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isCompact = width < 380;
@@ -195,64 +195,80 @@ export default function AnalisisScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingTop: 0, paddingBottom: Math.max(insets.bottom, 16) + 130, paddingHorizontal: width < 360 ? 16 : 24 }]}
       >
-
-
-        <View style={styles.summaryCard}>
-          <View style={[styles.waterMarkBox, { width: waterDropSize, height: waterDropSize }]}>
-            <WaterDropIcon width={waterDropSize} height={waterDropSize} accessibilityLabel="Status kualitas air" />
-            <WarningBadgeIcon width={warningBadgeSize} height={warningBadgeSize} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
-          </View>
-          <View style={styles.summaryContent}>
-            <Text style={styles.ikaLabel}>IKA</Text>
-            <View style={styles.scoreRow}>
-              <Text style={styles.ikaScore} numberOfLines={1} adjustsFontSizeToFit>3,57</Text>
-              <View style={styles.statusBadge}><Text style={styles.statusBadgeText}>Kotor</Text></View>
+        {!analysisData ? (
+          <View style={[styles.emptyCard, { padding: cardPadding }]}>
+            <View style={styles.emptyIconBadge}>
+              <BarChartIcon width={36} height={36} color="#005E36" />
             </View>
-            <Text style={styles.summaryCaption}>Berdasarkan skor bioindikator makroinvertebrata</Text>
+            <Text style={styles.emptyTitle}>Belum Ada Data Analisis</Text>
+            <Text style={styles.emptyDescription}>
+              Simpan data pengamatan di halaman Input Pengamatan untuk melihat ringkasan kondisi sungai.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Input Pengamatan"
+              onPress={() => router.replace('/input-observation')}
+              style={styles.emptyActionButton}
+            >
+              <Text style={styles.emptyActionLabel}>Input Pengamatan</Text>
+            </Pressable>
           </View>
-        </View>
-        <View style={styles.detailCard}>
-          <View pointerEvents="none" style={styles.detailCardIllustration}>
-            <BiodiversityFillIcon width={154} height={47} style={styles.detailCardIllustrationFill} />
-            <BiodiversityLineIcon width={159} height={53} style={styles.detailCardIllustrationLine} />
-          </View>
-          <DiversityLeafIcon width={29} height={32} accessibilityLabel="Keanekaragaman" />
-          <View style={styles.detailCardTextGroup}>
-            <Text style={styles.detailCardTitle}>Keanekaragaman H’</Text>
-            <Text style={styles.detailCardScore}>1,60</Text>
-          </View>
-        </View>
-
-
-
-
-
-        <View style={[styles.card, { padding: cardPadding }]}>
-          <View style={styles.cardHeading}><PieChartIcon width={32} height={32} accessibilityLabel="Komposisi organisme" /><Text style={styles.cardTitle}>Komposisi Organisme</Text></View>
-          <View style={styles.compositionContent}>
-            <DonutChart data={organismRows} size={donutSize} thickness={isCompact ? 22 : 26} />
-            <View style={styles.legend}>
-              {organismRows.map(({ label, percentage, color }) => (
-                <View key={label} style={styles.legendRow}>
-                  <View style={[styles.legendDot, { backgroundColor: color }]} />
-                  <Text style={styles.legendLabel} numberOfLines={1} adjustsFontSizeToFit>{label}</Text>
-                  <Text style={styles.legendValue}>{`${percentage}%`}</Text>
+        ) : (
+          <>
+            <View style={styles.summaryCard}>
+              <View style={[styles.waterMarkBox, { width: waterDropSize, height: waterDropSize }]}>
+                <WaterDropIcon width={waterDropSize} height={waterDropSize} accessibilityLabel="Status kualitas air" />
+                <WarningBadgeIcon width={warningBadgeSize} height={warningBadgeSize} style={styles.warningBadge} accessibilityLabel="Peringatan kondisi air" />
+              </View>
+              <View style={styles.summaryContent}>
+                <Text style={styles.ikaLabel}>IKA</Text>
+                <View style={styles.scoreRow}>
+                  <Text style={styles.ikaScore} numberOfLines={1} adjustsFontSizeToFit>3,57</Text>
+                  <View style={styles.statusBadge}><Text style={styles.statusBadgeText}>Kotor</Text></View>
                 </View>
-              ))}
+                <Text style={styles.summaryCaption}>Berdasarkan skor bioindikator makroinvertebrata</Text>
+              </View>
             </View>
-          </View>
-        </View>
+            <View style={styles.detailCard}>
+              <View pointerEvents="none" style={styles.detailCardIllustration}>
+                <BiodiversityFillIcon width={154} height={47} style={styles.detailCardIllustrationFill} />
+                <BiodiversityLineIcon width={159} height={53} style={styles.detailCardIllustrationLine} />
+              </View>
+              <DiversityLeafIcon width={29} height={32} accessibilityLabel="Keanekaragaman" />
+              <View style={styles.detailCardTextGroup}>
+                <Text style={styles.detailCardTitle}>Keanekaragaman H’</Text>
+                <Text style={styles.detailCardScore}>1,60</Text>
+              </View>
+            </View>
 
-        <View style={[styles.card, { padding: cardPadding }]}>
-          <View style={styles.cardHeading}><LabFlaskIcon width={24} height={28} accessibilityLabel="Parameter pendukung" /><Text style={styles.cardTitle}>Parameter Pendukung</Text></View>
-          <View style={styles.parameterGrid}>
-            <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>25 °C</Text></View>
-            <View style={styles.divider} />
-            <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>6,8 – 7,6</Text></View>
-            <View style={styles.divider} />
-            <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>55,5 – 64 cm</Text></View>
-          </View>
-        </View>
+            <View style={[styles.card, { padding: cardPadding }]}>
+              <View style={styles.cardHeading}><PieChartIcon width={32} height={32} accessibilityLabel="Komposisi organisme" /><Text style={styles.cardTitle}>Komposisi Organisme</Text></View>
+              <View style={styles.compositionContent}>
+                <DonutChart data={organismRows} size={donutSize} thickness={isCompact ? 22 : 26} />
+                <View style={styles.legend}>
+                  {organismRows.map(({ label, percentage, color }) => (
+                    <View key={label} style={styles.legendRow}>
+                      <View style={[styles.legendDot, { backgroundColor: color }]} />
+                      <Text style={styles.legendLabel} numberOfLines={1} adjustsFontSizeToFit>{label}</Text>
+                      <Text style={styles.legendValue}>{`${percentage}%`}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.card, { padding: cardPadding }]}>
+              <View style={styles.cardHeading}><LabFlaskIcon width={24} height={28} accessibilityLabel="Parameter pendukung" /><Text style={styles.cardTitle}>Parameter Pendukung</Text></View>
+              <View style={styles.parameterGrid}>
+                <View style={styles.parameter}><ThermometerIcon width={18} height={39} accessibilityLabel="Suhu" /><Text style={styles.parameterLabel}>Suhu</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>25 °C</Text></View>
+                <View style={styles.divider} />
+                <View style={styles.parameter}><PhDropIcon width={27} height={39} accessibilityLabel="pH" /><Text style={styles.parameterLabel}>pH</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>6,8 – 7,6</Text></View>
+                <View style={styles.divider} />
+                <View style={styles.parameter}><SunIcon width={39} height={39} accessibilityLabel="Kecerahan" /><Text style={styles.parameterLabel}>Kecerahan</Text><Text style={styles.parameterValue} numberOfLines={1} adjustsFontSizeToFit>55,5 – 64 cm</Text></View>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -299,4 +315,10 @@ const styles = StyleSheet.create({
   divider: { width: StyleSheet.hairlineWidth, alignSelf: 'stretch', backgroundColor: '#777' },
   parameterLabel: { marginTop: 5, color: '#101010', fontFamily: 'Poppins-Regular', fontSize: 12, lineHeight: 16 },
   parameterValue: { marginTop: 2, color: '#101010', fontFamily: 'Poppins-Bold', fontSize: 13, lineHeight: 18, textAlign: 'center' },
+  emptyCard: { marginTop: 12, borderRadius: 25, backgroundColor: '#FFFFFF', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 6, elevation: 3 },
+  emptyIconBadge: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#EDF7F0', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  emptyTitle: { color: '#000000', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 18, lineHeight: 24, textAlign: 'center' },
+  emptyDescription: { marginTop: 8, color: '#4B5563', fontFamily: 'Poppins-Regular', fontSize: 13.5, lineHeight: 20, textAlign: 'center' },
+  emptyActionButton: { marginTop: 20, paddingHorizontal: 22, height: 42, borderRadius: 15, backgroundColor: '#005E36', alignItems: 'center', justifyContent: 'center' },
+  emptyActionLabel: { color: '#FFFFFF', fontFamily: 'Poppins-SemiBold', fontWeight: '600', fontSize: 14, lineHeight: 18, includeFontPadding: false },
 });
