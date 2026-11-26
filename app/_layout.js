@@ -21,7 +21,7 @@ function AppNavigation() {
   }, [pathname]);
 
   const navigateToTab = (tab) => {
-    if (tab.key !== activeTab) router.replace(tab.path);
+    if (pathname !== tab.path) router.replace(tab.path);
   };
 
   return (
